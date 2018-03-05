@@ -204,6 +204,7 @@ int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operand
 					else if (instruction->op_mask[index] == 0x1F)
 						imm_lsp_len = 5; // Less significant part of imm got 5-bits len
 					imm=(SHIFT_LEFT(operands[index+1].value,imm_lsp_len)|operands[index].value);
+				index++;
 				}
 			}
 			strcat(string," #");
@@ -256,7 +257,11 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
       return -1;
     }
 
-    high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, is_big_endian);
+    // todo:
+    // To disassemble from ELF we need "is_big_endian = 0",
+    // while from target "is_big_endian = 1"; Some mechanism should be implemented
+    // high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, is_big_endian);
+    high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, 1);
 
     switch (get_instruction_type(high_bits)){
 
