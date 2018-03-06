@@ -195,7 +195,10 @@ int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operand
 			sprintf(value_string,"%d",operands[index].value);
 			break;
 		case imm_t:
-			imm = operands[index].value;
+			strcat(string," #");
+			sprintf(value_string,"%d",operands[index].value);
+			break;
+		case imm_t_lsp:
 			if(index<instruction->num_of_operands-1){
 				if(operands[index+1].type==imm_t){
 					unsigned int imm_lsp_len;
@@ -207,9 +210,8 @@ int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operand
 				index++;
 				}
 			}
-			strcat(string," #");
-			sprintf(value_string,"%d",imm);
-			break;
+		break;
+
 		case vcs_t:
 			strcat(string," vcs");
 			sprintf(value_string,"%s", vcs_str[operands[index].value]);
