@@ -199,8 +199,9 @@ int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operand
 			sprintf(value_string,"%d",operands[index].value);
 			break;
 		case imm_t_lsp:
+			imm = 0;
 			if(index<instruction->num_of_operands-1){
-				if(operands[index+1].type==imm_t){
+				if(operands[index+1].type==imm_t_msp){
 					unsigned int imm_lsp_len;
 					if (instruction->op_mask[index] == 0x3FF)
 						imm_lsp_len = 10; // Less significant part of imm got 10-bits len
@@ -210,6 +211,9 @@ int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operand
 				index++;
 				}
 			}
+			strcat(string," #");
+			sprintf(value_string,"%d",imm);
+
 		break;
 
 		case vcs_t:
