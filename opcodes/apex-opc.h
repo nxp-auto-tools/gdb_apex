@@ -17,6 +17,8 @@ typedef enum operand_type{
 	gap,
 	reg_t,
 	imm_t,
+	imm_t_lsp, //less significant part of imm
+	imm_t_msp, //most significant part of imm
 	vcs_t,
 	f_t,
 	sel_t

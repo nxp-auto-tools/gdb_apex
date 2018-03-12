@@ -374,8 +374,8 @@ const apex_opc_info_t apex_APC_32b_vector_opc_info[] =
 	{     "vsleu", 0x400004D8UL, 4, {reg_t,reg_t,reg_t,vcs_t,gap},	{0x3,0x7,0x1F,0x7,0},		{22,19,14,0,0},0x100F800},
 	{     "vsltu", 0x400004E0UL, 4, {reg_t,reg_t,reg_t,vcs_t,gap},	{0x3,0x7,0x1F,0x7,0},		{22,19,14,0,0},0x100F800},
 			/*Vector pointer modification instructions*/
-	{      "padd", 0x40000338UL, 3, {reg_t,imm_t,imm_t,gap,gap},		{0x1F,0x3FF,0x3,0,0},		{20,10,0,0,0},0x0},
-	{       "add", 0x540000B8UL, 4, {reg_t,reg_t,imm_t,imm_t,gap},	{0x1F,0x1F,0x1F,0x3,0},		{20,15,10,0,0},0x0},
+	{      "padd", 0x40000338UL, 3, {reg_t,imm_t_lsp,imm_t_msp,gap,gap},		{0x1F,0x3FF,0x3,0,0},		{20,10,0,0,0},0x0},
+	{       "add", 0x540000B8UL, 4, {reg_t,reg_t,imm_t_lsp,imm_t_msp,gap},	{0x1F,0x1F,0x1F,0x3,0},		{20,15,10,0,0},0x0},
 	{       "add", 0x540000C0UL, 3, {reg_t,reg_t,reg_t,gap,gap},		{0x1F,0x1F,0x1F,0,0},		{20,15,10,0,0},0x7},
 	{       "mov", 0x540000C8UL, 2, {reg_t,reg_t,gap,gap,gap},		{0x1F,0x1F,0,0,0},			{20,15,0,0,0},0x7C07},
 			/*Vector to vector movement*/
