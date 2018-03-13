@@ -241,7 +241,7 @@ int
 print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 
 	bfd_vma next_insn_addr = cur_insn_addr + bytes_per_word;
-	bfd_vma cur_pc = cur_insn_addr/4;
+	bfd_vma cur_pc = cur_insn_addr;
 	bfd_vma high_bits,low_bits;
 	bfd_byte instr_low_bytes [bytes_per_word];
 	bfd_byte instr_high_bytes [bytes_per_word];
@@ -254,7 +254,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 	memset(operands,0,5*sizeof(operands[0]));
 
     // read instruction-word at address pointed by "pc"
-	int status = (*info->read_memory_func) (cur_insn_addr, instr_high_bytes,
+	int status = (*info->read_memory_func) (cur_pc, instr_high_bytes,
     									bytes_per_word, info);
 
     if (status != 0){
@@ -282,11 +282,11 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 
     case combined_instruction_type:
         // read next instruction-word at address pointed by "pc+1" (for 64-bit insns)
-        status = (*info->read_memory_func) (next_insn_addr, instr_low_bytes,
+        status = (*info->read_memory_func) (cur_pc + 4, instr_low_bytes,
         		bytes_per_word, info);
         if (status != 0)
         {
-          (*info->memory_error_func) (status, next_insn_addr, info);
+          (*info->memory_error_func) (status, cur_pc + 4, info);
           return -1;
         }
         low_bits = bfd_get_bits (instr_low_bytes, bits_per_word, is_big_endian);

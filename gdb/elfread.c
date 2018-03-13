@@ -456,6 +456,8 @@ elf_symtab_read (struct objfile *objfile, int type,
 	      /* ms_type = mst_unknown; */
 	      continue;	/* Skip this symbol.  */
 	    }
+
+	  
 	  msym = record_minimal_symbol
 	    (sym->name, strlen (sym->name), copy_names, symaddr,
 	     ms_type, sym->section, objfile);
@@ -468,6 +470,7 @@ elf_symtab_read (struct objfile *objfile, int type,
 		{
 		  /* Pass symbol size field in via BFD.  FIXME!!!  */
 		  elf_symbol_type *elf_sym = (elf_symbol_type *) sym;
+
 		  SET_MSYMBOL_SIZE (msym, elf_sym->internal_elf_sym.st_size);
 		}
 

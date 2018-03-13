@@ -39,6 +39,8 @@
 #include "dis-asm.h"
 #include "common/errors.h"
 
+void apex_objfile_relocate();
+
 static enum return_value_convention
 apex_return_value (struct gdbarch  *gdbarch,
 		   struct value    *functype,
@@ -74,7 +76,6 @@ static const char *const ctrl_regs [] = {
 		"cmem_if_apu_dm_start"
 };
 
-CORE_ADDR apex_apu_data_mem_start;
 
 static struct type *
 apex_builtin_type_vec_512 (struct gdbarch *gdbarch)
@@ -169,42 +170,16 @@ apex_breakpoint_from_pc (struct gdbarch *gdbarch,
 			 int            *bp_size)
 {
   static const gdb_byte breakpoint[] = {0};
-  *bp_size = 1;
+  *bp_size = 4;
   return breakpoint;
 
 }
 
-/*static CORE_ADDR
-apex_pc_to_imem_addr (ULONGEST pc, ULONGEST dm_start){
-
-	CORE_ADDR imem_addr = (CORE_ADDR)(pc & 0xFFFFFFFF) *4 \
-			- (CORE_ADDR)(dm_start & 0xFFFFFFFF);
-
-	//for P&E_multilink_universal
-	CORE_ADDR imem_addr;
-
-	union mem_mapped_dm_start{
-		unsigned long addr;
-		gdb_byte addr_bytes[4];
-	}mem_mapped_dm_start;
-
-	if(0 > target_read_memory(0x0018000cU,mem_mapped_dm_start.addr_bytes,4)){
-		fprintf(stderr,"_apex_pc_to_imem_addr_: \
-				can't read from target memory with target_read_memory\n");
-		return 0;
-	}
-	imem_addr = pc*4 - mem_mapped_dm_start.addr;
-
-	return imem_addr;
-}*/
-
 static CORE_ADDR
 apex_read_pc (struct regcache* regcache){
 
-	  ULONGEST dm_start_temp, pc;
+	  ULONGEST pc;
 	  regcache_cooked_read_unsigned (regcache, APEX_PC_REGNUM, &pc);
-	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start_temp);
-	  apex_apu_data_mem_start = (CORE_ADDR)(dm_start_temp & 0xFFFFFFFF);
 	  return (CORE_ADDR)(pc & 0xFFFFFFFF);
 }
 
@@ -223,6 +198,7 @@ apex_unwind_sp (struct gdbarch *gdbarch, struct frame_info *this_frame)
 {
 	return frame_unwind_register_unsigned (this_frame, APEX_SP_REGNUM);
 }
+
 /* apex cache structure.  */
 struct apex_unwind_cache
 {
@@ -270,8 +246,8 @@ apex_analyze_prologue (struct gdbarch *gdbarch,
 
     if (this_frame)
       {
-	cache->base = get_frame_register_unsigned (this_frame, APEX_SP_REGNUM);
-	cache->cfa = cache->base + frame_base_offset_to_sp;
+    	cache->base = get_frame_register_unsigned (this_frame, APEX_SP_REGNUM);
+    	cache->cfa = cache->base + frame_base_offset_to_sp;
       }
   }
 
@@ -292,10 +268,10 @@ apex_skip_prologue (struct gdbarch *gdbarch, CORE_ADDR pc)
   if (find_pc_partial_function (pc, NULL, &func_addr, NULL))
     {
       CORE_ADDR post_prologue_pc =
-	skip_prologue_using_sal (gdbarch, func_addr);
+    		  skip_prologue_using_sal (gdbarch, func_addr);
 
       if (post_prologue_pc != 0)
-	return max (pc, post_prologue_pc);
+    	  return max (pc, post_prologue_pc);
     }
 
    return pc;
@@ -406,12 +382,68 @@ apex_dwarf_reg_to_regnum (struct gdbarch *gdbarch, int reg)
   return -1;
 }
 
+static CORE_ADDR
+apex_adjust_dwarf2_addr (CORE_ADDR elf_addr)
+{
+	return elf_addr;
+}
+
+static CORE_ADDR
+apex_adjust_dwarf2_line (CORE_ADDR elf_addr, int rel)
+{
+	return elf_addr;
+}
+
+
 static int
 apex_gdb_print_insn (bfd_vma memaddr, disassemble_info *info){
 
-	return print_insn_apex (memaddr*4-apex_apu_data_mem_start, info);
+	return print_insn_apex (memaddr, info);
 }
 
+static
+void apex_extended_remote_post_attach (struct target_ops *ops, int pid){
+    struct section_offsets *offsets;
+    
+    if (symfile_objfile == NULL)
+        return;
+
+    apex_objfile_relocate();
+}
+
+
+void apex_objfile_relocate(){
+	CORE_ADDR text_addr, data_addr;
+	struct section_offsets *offs;
+
+	if (symfile_objfile == NULL)
+		return;
+
+	ULONGEST dm_start,pm_start;
+	struct regcache* regcache = get_current_regcache();
+	regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start);
+	regcache_cooked_read_unsigned (regcache, cmem_if_apu_pm_start_regnum, &pm_start);
+
+	offs = ((struct section_offsets *)
+		  alloca (SIZEOF_N_SECTION_OFFSETS (symfile_objfile->num_sections)));
+
+	for (int i = 0; i < symfile_objfile->num_sections; i++){
+	  //look through all sections and if it executable or allocated do smthing ))
+		struct bfd_section *sect = symfile_objfile->sections[i].the_bfd_section;
+			offs->offsets[i] = 0;
+
+		if (sect == 0){
+			continue;
+		}
+
+		if ((sect->flags & (SEC_CODE | SEC_ALLOC | SEC_HAS_CONTENTS)) == (SEC_CODE | SEC_ALLOC | SEC_HAS_CONTENTS)){
+			offs->offsets[i] = pm_start;
+		}else if (sect->flags & SEC_ALLOC){
+			offs->offsets[i] = dm_start;
+		}
+	}
+	objfile_relocate (symfile_objfile, offs);
+}
 
 static struct gdbarch *
 apex_gdbarch_init (struct gdbarch_info info,
@@ -555,6 +587,7 @@ apex_gdbarch_init (struct gdbarch_info info,
   /* Program counter */
   set_gdbarch_read_pc (gdbarch, apex_read_pc);
 
+
   /* Functions to analyse frames */
   set_gdbarch_skip_prologue         (gdbarch, apex_skip_prologue);
   set_gdbarch_inner_than            (gdbarch, core_addr_lessthan);
@@ -564,7 +597,6 @@ apex_gdbarch_init (struct gdbarch_info info,
 
   /* instruction set printer */
   set_gdbarch_print_insn (gdbarch, apex_gdb_print_insn);
-
 
 
   return gdbarch;
@@ -606,7 +638,27 @@ apex_dump_tdep (struct gdbarch *gdbarch,
    registers. */
 /*---------------------------------------------------------------------------*/
 
+static struct cmd_list_element *apexcmdlist = NULL;
+
+static void
+apex_command(char *args, int from_tty)
+{
+  printf_unfiltered (_("\
+\"apex\" must be followed by an apporpriate subcommand.\n"));
+  help_list (apexcmdlist, "apex ", all_commands, gdb_stdout);
+}
+
+
+/* allow to dinamically relocate obj file inside in tdep */
+static void
+apexcmd_dyn_relocate (char *cmd, int from_tty)
+{
+	//gdbarch_objfile_relocate(target_gdbarch ()/*, symfile_objfile*/);
+	apex_objfile_relocate();
+}
+
 extern initialize_file_ftype _initialize_apex_tdep; /* -Wmissing-prototypes */
+
 
 void
 _initialize_apex_tdep (void)
@@ -617,6 +669,15 @@ _initialize_apex_tdep (void)
 	  /* Tell remote stub that we support XML target description.  */
 	  register_remote_support_xml ("apex");
 
+
+	  add_prefix_cmd ("apex", no_class, apex_command,
+	  		  _("Various APEX-specific commands."),
+	  		  &apexcmdlist, "apex ", 0, &cmdlist);
+
+	  add_cmd ("dynamic-relocate", no_class, apexcmd_dyn_relocate,
+	            _("Dynamic relocate object file."),
+	            &apexcmdlist);
+       
 
 } /* _initialize_apex_tdep() */
 

@@ -7145,6 +7145,7 @@ add_partial_subprogram (struct partial_die_info *pdi,
 						  pdi->lowpc + baseaddr);
 	      highpc = gdbarch_adjust_dwarf2_addr (gdbarch,
 						   pdi->highpc + baseaddr);
+	      
 	      addrmap_set_empty (objfile->psymtabs_addrmap, lowpc, highpc - 1,
 				 cu->per_cu->v.psymtab);
 	    }
@@ -11966,6 +11967,11 @@ dwarf2_ranges_read (unsigned offset, CORE_ADDR *low_return,
       buffer += addr_size;
       offset += 2 * addr_size;
 
+      //TODO: move this code to the appropriate function in gdbarch.
+      range_beginning *= 4;
+      range_end *= 4;
+      //END TODO
+
       /* An end of list marker is a pair of zero addresses.  */
       if (range_beginning == 0 && range_end == 0)
 	/* Found the end of list entry.  */
@@ -12027,6 +12033,7 @@ dwarf2_ranges_read (unsigned offset, CORE_ADDR *low_return,
 					      range_beginning + baseaddr);
 	  highpc = gdbarch_adjust_dwarf2_addr (gdbarch,
 					       range_end + baseaddr);
+	  
 	  addrmap_set_empty (objfile->psymtabs_addrmap, lowpc, highpc - 1,
 			     ranges_pst);
 	}
@@ -12085,6 +12092,12 @@ dwarf2_get_pc_bounds (struct die_info *die, CORE_ADDR *lowpc,
         {
 	  low = attr_value_as_address (attr);
 	  high = attr_value_as_address (attr_high);
+	  
+      //TODO: Move these code to the apropriate gdbarch function.
+	  low *= 4;
+	  high *= 4;
+	  //END TODO.
+            
 	  if (cu->header.version >= 4 && attr_form_is_constant (attr_high))
 	    high += low;
 	}
@@ -12135,6 +12148,7 @@ dwarf2_get_pc_bounds (struct die_info *die, CORE_ADDR *lowpc,
   if (low == 0 && !dwarf2_per_objfile->has_section_at_zero)
     return PC_BOUNDS_INVALID;
 
+  
   *lowpc = low;
   if (highpc)
     *highpc = high;
@@ -12257,7 +12271,12 @@ dwarf2_record_block_ranges (struct die_info *die, struct block *block,
       if (attr)
         {
           CORE_ADDR low = attr_value_as_address (attr);
-	  CORE_ADDR high = attr_value_as_address (attr_high);
+    	  CORE_ADDR high = attr_value_as_address (attr_high);
+           
+          //TODO: Move these code to apropriate gdbarch function.
+          low *=4;
+          high *=4;
+          //END TODO.
 
 	  if (cu->header.version >= 4 && attr_form_is_constant (attr_high))
 	    high += low;
@@ -15897,10 +15916,18 @@ read_partial_die (const struct die_reader_specs *reader,
 	case DW_AT_low_pc:
 	  has_low_pc_attr = 1;
 	  part_die->lowpc = attr_value_as_address (&attr);
+	  //TODO: Move these code to aproptiate gdbatch function
+	  if (part_die->tag == DW_TAG_subprogram)
+		  part_die->lowpc *= 4;
+	  //END TODO.
 	  break;
 	case DW_AT_high_pc:
 	  has_high_pc_attr = 1;
 	  part_die->highpc = attr_value_as_address (&attr);
+	  //TODO: Move these code to aproptiate gdbatch function
+	  if (part_die->tag == DW_TAG_subprogram)
+		  part_die->highpc *= 4;
+	  //END TODO.
 	  if (cu->header.version >= 4 && attr_form_is_constant (&attr))
 		high_pc_relative = 1;
 	  break;
@@ -17955,6 +17982,9 @@ dwarf_decode_lines_1 (struct line_header *lh, struct dwarf2_cu *cu,
 		  {
 		    CORE_ADDR address
 		      = read_address (abfd, line_ptr, cu, &bytes_read);
+		    //TODO: Move these code to aproptiate gdbatch function
+		    address = address * 4;
+		    //END TODO.
 
 		    line_ptr += bytes_read;
 		    check_line_address (cu, &state_machine, line_ptr,
