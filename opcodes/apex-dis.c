@@ -353,18 +353,18 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
         	extract_vliw_operands(vliw_insn_entity,operands,vliw_insn_value);
         	if(compose_64b_scalar_mnemonic(vliw_insn_entity,operands,insns_mnemonic)>0){
         		info->fprintf_func(info->stream, "%s",insns_mnemonic);
-        		return double_word;
+        		return 8;
         	}
         }
         fprintf (stderr,"_print_insn_scalar_64b_: unparsed command with addr=0x%08lx\n",cur_pc);
         info->fprintf_func(info->stream, "0x%08lx ",high_bits);
         info->fprintf_func(info->stream, "0x%08lx ",low_bits);
-		return double_word;
+		return 4;
 
     default:
     	fprintf (stderr,"_print_insn: unrecognized insn type\n");
         info->fprintf_func(info->stream, "0x%08lx",high_bits);
-    	return single_word;
+    	return 4;
     }
 
 
@@ -374,11 +374,11 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     	extract_operands(current_instruction,operands,high_bits);
     	if(compose_mnemonic(current_instruction,operands,insns_mnemonic)>0){
     		info->fprintf_func(info->stream,"%s", insns_mnemonic);
-    		return single_word;
+    		return 4;
     	}
     }
 
     fprintf (stderr,"_print_insn: unparsed command with addr=0x%08lx\n",cur_pc);
     info->fprintf_func(info->stream, "0x%08lx",high_bits);
-	return single_word;
+	return 4;
 }
