@@ -3653,14 +3653,6 @@ get_offsets (void)
       segments[0] = data->segment_bases[0] + text_addr;
       num_segments = 1;
     }
-  else if (data && data->num_segments == 4)
-      {
-        segments[0] = data->segment_bases[0] + text_addr;
-        segments[1] = data->segment_bases[1] + data_addr;
-        segments[2] = data->segment_bases[2] + data_addr;
-        //segments[3] = data->segment_bases[3] + data_addr;
-        num_segments = 3;
-      }
   /* There's no way to relocate by segment.  */
   else
     do_segments = 0;
@@ -5388,6 +5380,7 @@ extended_remote_post_attach (struct target_ops *ops, int pid)
   /* Get text, data & bss offsets.  */
   //get_offsets ();
     /* This is a bad behaviour formally we must re-setup this function on our implementation*/
+    //TODO: Improve this part in APEXD implementation
     apex_objfile_relocate();
 
   /* In certain cases GDB might not have had the chance to start
