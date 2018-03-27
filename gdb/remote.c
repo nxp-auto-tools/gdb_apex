@@ -3618,6 +3618,7 @@ get_offsets (void)
   else if (*ptr != '\0')
     warning (_("Target reported unsupported offsets: %s"), buf);
 
+
   offs = ((struct section_offsets *)
 	  alloca (SIZEOF_N_SECTION_OFFSETS (symfile_objfile->num_sections)));
   memcpy (offs, symfile_objfile->section_offsets,
@@ -3662,11 +3663,11 @@ get_offsets (void)
 						 offs, num_segments, segments);
 
       if (ret == 0 && !do_sections)
-	error (_("Can not handle qOffsets TextSeg "
-		 "response with this symbol file"));
+    	  error (_("Can not handle qOffsets TextSeg "
+    			  "response with this symbol file"));
 
       if (ret > 0)
-	do_sections = 0;
+    	  do_sections = 0;
     }
 
   if (data)
@@ -5371,12 +5372,16 @@ extended_remote_attach (struct target_ops *target, const char *args,
 }
 
 /* Implementation of the to_post_attach method.  */
+extern void apex_objfile_relocate();
 
 static void
 extended_remote_post_attach (struct target_ops *ops, int pid)
 {
   /* Get text, data & bss offsets.  */
-  get_offsets ();
+  //get_offsets ();
+    /* This is a bad behaviour formally we must re-setup this function on our implementation*/
+    //TODO: Improve this part in APEXD implementation
+    apex_objfile_relocate();
 
   /* In certain cases GDB might not have had the chance to start
      symbol lookup up until now.  This could happen if the debugged

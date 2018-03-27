@@ -9,6 +9,9 @@
 #include "apex-dis.h"
 #include "elf-bfd.h"
 
+#define SINGLE_CMD_SIZE 4
+#define DOUBLE_CMD_SIZE 8
+
 typedef struct operand{
 	int value;
 	operand_type type;
@@ -237,11 +240,12 @@ int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operand
 	return strlen(string);
 }
 
+/*Return vaules is offset to next command*/
 int
 print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 
 	bfd_vma next_insn_addr = cur_insn_addr + bytes_per_word;
-	bfd_vma cur_pc = cur_insn_addr/4;
+	bfd_vma cur_pc = cur_insn_addr;
 	bfd_vma high_bits,low_bits;
 	bfd_byte instr_low_bytes [bytes_per_word];
 	bfd_byte instr_high_bytes [bytes_per_word];
@@ -254,7 +258,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 	memset(operands,0,5*sizeof(operands[0]));
 
     // read instruction-word at address pointed by "pc"
-	int status = (*info->read_memory_func) (cur_insn_addr, instr_high_bytes,
+	int status = (*info->read_memory_func) (cur_pc, instr_high_bytes,
     									bytes_per_word, info);
 
     if (status != 0){
@@ -282,11 +286,11 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 
     case combined_instruction_type:
         // read next instruction-word at address pointed by "pc+1" (for 64-bit insns)
-        status = (*info->read_memory_func) (next_insn_addr, instr_low_bytes,
+        status = (*info->read_memory_func) (cur_pc + SINGLE_CMD_SIZE, instr_low_bytes,
         		bytes_per_word, info);
         if (status != 0)
         {
-          (*info->memory_error_func) (status, next_insn_addr, info);
+          (*info->memory_error_func) (status, cur_pc + SINGLE_CMD_SIZE, info);
           return -1;
         }
         low_bits = bfd_get_bits (instr_low_bytes, bits_per_word, is_big_endian);
@@ -353,18 +357,18 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
         	extract_vliw_operands(vliw_insn_entity,operands,vliw_insn_value);
         	if(compose_64b_scalar_mnemonic(vliw_insn_entity,operands,insns_mnemonic)>0){
         		info->fprintf_func(info->stream, "%s",insns_mnemonic);
-        		return double_word;
+        		return DOUBLE_CMD_SIZE;
         	}
         }
         fprintf (stderr,"_print_insn_scalar_64b_: unparsed command with addr=0x%08lx\n",cur_pc);
         info->fprintf_func(info->stream, "0x%08lx ",high_bits);
         info->fprintf_func(info->stream, "0x%08lx ",low_bits);
-		return double_word;
+		return SINGLE_CMD_SIZE;
 
     default:
     	fprintf (stderr,"_print_insn: unrecognized insn type\n");
         info->fprintf_func(info->stream, "0x%08lx",high_bits);
-    	return single_word;
+    	return SINGLE_CMD_SIZE;
     }
 
 
@@ -374,11 +378,11 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     	extract_operands(current_instruction,operands,high_bits);
     	if(compose_mnemonic(current_instruction,operands,insns_mnemonic)>0){
     		info->fprintf_func(info->stream,"%s", insns_mnemonic);
-    		return single_word;
+    		return SINGLE_CMD_SIZE;
     	}
     }
 
     fprintf (stderr,"_print_insn: unparsed command with addr=0x%08lx\n",cur_pc);
     info->fprintf_func(info->stream, "0x%08lx",high_bits);
-	return single_word;
+	return SINGLE_CMD_SIZE;
 }
