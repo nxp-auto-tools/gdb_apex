@@ -271,7 +271,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     // To disassemble from ELF we need "is_big_endian = 1",
     // while from target "is_big_endian = 0"; Some mechanism should be implemented
     // high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, is_big_endian);
-    high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, 0);
+    high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, 1);
 
     switch (get_instruction_type(high_bits)){
 
@@ -293,7 +293,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
           (*info->memory_error_func) (status, cur_pc + SINGLE_CMD_SIZE, info);
           return -1;
         }
-        low_bits = bfd_get_bits (instr_low_bytes, bits_per_word, is_big_endian);
+        low_bits = bfd_get_bits (instr_low_bytes, bits_per_word, 1);
     	opcode_table = apex_APC_32b_scalar_opc_info;
     	scalar_insn_part = find_in_table_scalar_insn_part(opcode_table,high_bits);
      	opcode_table = apex_APC_32b_vector_opc_info;
@@ -331,7 +331,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 	        fprintf (stderr,"_print_insn_combined_: vector insn part not found; addr=0x%08lx;\n",cur_pc);
 
 		}
-		return double_word;
+		return DOUBLE_CMD_SIZE;
     case scalar64_instruction_type:
         // read next instruction-word at address pointed by "pc+1" (for 64-bit insns)
         status = (*info->read_memory_func) (next_insn_addr, instr_low_bytes,
@@ -363,12 +363,12 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
         fprintf (stderr,"_print_insn_scalar_64b_: unparsed command with addr=0x%08lx\n",cur_pc);
         info->fprintf_func(info->stream, "0x%08lx ",high_bits);
         info->fprintf_func(info->stream, "0x%08lx ",low_bits);
-		return SINGLE_CMD_SIZE;
+		return DOUBLE_CMD_SIZE;
 
     default:
     	fprintf (stderr,"_print_insn: unrecognized insn type\n");
         info->fprintf_func(info->stream, "0x%08lx",high_bits);
-    	return SINGLE_CMD_SIZE;
+    	return DOUBLE_CMD_SIZE;
     }
 
 

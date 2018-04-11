@@ -105,10 +105,10 @@ const apex_opc_info_t apex_APC_32b_scalar_opc_info[] =
 		/*ACP Logical instructions*/
 	{       "and", 0x00000005UL, 3, {reg_t,reg_t,reg_t,	gap,gap}, {0x1F,0x1F,0x1F,0,0},		{20,15,10,0,0}, 0x300},
 	{      "andi", 0x06800000UL, 2, {reg_t,imm_t,gap,	gap,gap}, {0x1F,0xFFFF,0,0,0},		{16,0,0,0,0},	0},
-	{       "ori", 0x2C000000UL, 3, {reg_t,reg_t,imm_t,	gap,gap}, {0x1F,0x1F,0x7fff,0,0},	{20,15,0,0,0},	0},
+	{      "andi", 0x2E000000UL, 3, {reg_t,reg_t,imm_t,	gap,gap}, {0x1F,0x1F,0x7FFF,0,0},	{24,19,14,0,0},	0},
 	{        "or", 0x0000000DUL, 3, {reg_t,reg_t,reg_t,	gap,gap}, {0x1F,0x1F,0x1F,0,0},		{20,15,10,0,0}, 0x300},
 	{       "ori", 0x06A00000UL, 2, {reg_t,imm_t,gap,	gap,gap}, {0x1F,0xFFFF,0,0,0},		{16,0,0,0,0},	0},
-	{       "ori", 0x27000000UL, 3, {reg_t,reg_t,imm_t,	gap,gap}, {0x1F,0x1F,0x7fff,0,0},	{20,15,0,0,0},	0},
+	{       "ori", 0x2C000000UL, 3, {reg_t,reg_t,imm_t,	gap,gap}, {0x1F,0x1F,0x7fff,0,0},	{20,15,0,0,0},	0},
 	{       "xor", 0x0000001DUL, 3, {reg_t,reg_t,reg_t,	gap,gap}, {0x1F,0x1F,0x1F,0,0},		{20,15,10,0,0}, 0x300},
 	{      "xori", 0x06C00000UL, 2, {reg_t,reg_t,imm_t,	gap,gap}, {0x1F,0xFFFF,0,0,0},		{16,0,0,0,0},	0},
 	{      "xori", 0x30000000UL, 3, {reg_t,reg_t,imm_t,	gap,gap}, {0x1F,0x1F,0x7fff,0,0},	{20,15,0,0,0},	0},
@@ -335,7 +335,7 @@ const apex_opc_info_t apex_APC_32b_vector_opc_info[] =
 	{      "vcsr", 0x400005C0UL, 4, {reg_t,reg_t,reg_t,vcs_t,gap},	{0x3,0x3,0x7,0x7,0},		{22,19,15,0,0},0x4F800},
 	{      "vcsl", 0x400005C8UL, 4, {reg_t,reg_t,reg_t,vcs_t,gap},	{0x3,0x3,0x7,0x7,0},		{22,19,15,0,0},0x47800},
 	{      "vmvc", 0x400001A0UL, 3, {reg_t,reg_t,vcs_t,gap,gap},		{0x3,0x7,0x7,0,0},			{22,19,0,0,0},0x107FC00},
-	{      "vmvc", 0x400001A8UL, 3, {reg_t,reg_t,vcs_t,gap,gap},		{0x3,0x3,0x7,0,0},			{22,19,0,0,0},0x7FC00},
+	{      "vmcv", 0x400001A8UL, 3, {reg_t,reg_t,vcs_t,gap,gap},		{0x3,0x3,0x7,0,0},			{22,19,0,0,0},0x7FC00},
 	{       "vwe", 0x4C000000UL, 5, {reg_t,reg_t,reg_t,imm_t,vcs_t},	{0x7,0x7,0x1F,0xFF,0x7},	{22,19,14,3,0},0x0},
 	{       "vwe", 0x4C002000UL, 5, {reg_t,reg_t,reg_t,reg_t,vcs_t},	{0x7,0x7,0x1F,0x1F,0x7},	{22,19,14,3,0},0x700},
 	{       "vwe", 0x4C001000UL, 5, {reg_t,reg_t,reg_t,imm_t,vcs_t},	{0x7,0x7,0x7,0xFF,0x7},		{22,19,16,3,0},0x0},
@@ -374,8 +374,8 @@ const apex_opc_info_t apex_APC_32b_vector_opc_info[] =
 	{     "vsleu", 0x400004D8UL, 4, {reg_t,reg_t,reg_t,vcs_t,gap},	{0x3,0x7,0x1F,0x7,0},		{22,19,14,0,0},0x100F800},
 	{     "vsltu", 0x400004E0UL, 4, {reg_t,reg_t,reg_t,vcs_t,gap},	{0x3,0x7,0x1F,0x7,0},		{22,19,14,0,0},0x100F800},
 			/*Vector pointer modification instructions*/
-	{      "padd", 0x40000338UL, 3, {reg_t,imm_t_lsp,imm_t_msp,gap,gap},		{0x1F,0x3FF,0x3,0,0},		{20,10,0,0,0},0x0},
-	{       "add", 0x540000B8UL, 4, {reg_t,reg_t,imm_t_lsp,imm_t_msp,gap},	{0x1F,0x1F,0x1F,0x3,0},		{20,15,10,0,0},0x0},
+	{      "padd", 0x40000338UL, 3, {reg_t,imm_t_lsp,imm_t_msp,gap,gap},		{0x1F,0x3FF,0x7,0,0},		{20,10,0,0,0},0x0},
+	{       "add", 0x540000B8UL, 4, {reg_t,reg_t,imm_t_lsp,imm_t_msp,gap},	{0x1F,0x1F,0x1F,0x7,0},		{20,15,10,0,0},0x0},
 	{       "add", 0x540000C0UL, 3, {reg_t,reg_t,reg_t,gap,gap},		{0x1F,0x1F,0x1F,0,0},		{20,15,10,0,0},0x7},
 	{       "mov", 0x540000C8UL, 2, {reg_t,reg_t,gap,gap,gap},		{0x1F,0x1F,0,0,0},			{20,15,0,0,0},0x7C07},
 			/*Vector to vector movement*/
