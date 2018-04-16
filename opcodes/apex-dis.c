@@ -304,7 +304,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
         if (scalar_insn_part != NULL){
         	if(extract_operands(scalar_insn_part,operands,high_bits)==scalar_insn_part->num_of_operands){
         		scalar_result = compose_mnemonic(scalar_insn_part,operands,insns_mnemonic);
-        		strcat(insns_mnemonic," ");
+        		strcat(insns_mnemonic,"\n");
         	} else {
                 fprintf (stderr,"_print_insn_combined_: scalar operands extracted in wrong way; addr=0x%08lx\n",cur_pc);
                 info->fprintf_func(info->stream, "0x%08lx ",high_bits);
@@ -351,7 +351,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
         const apex_64_bit_opc_info_t *vliw_opcode_table=apex_APC_64b_scalar_opc_info;
 
     	const apex_64_bit_opc_info_t *vliw_insn_entity = find_in_vliw_table(vliw_opcode_table,vliw_insn_value);
-        info->fprintf_func(info->stream, "_vliw ");
+        //info->fprintf_func(info->stream, "_vliw ");
 
         if (vliw_insn_entity != NULL){
         	extract_vliw_operands(vliw_insn_entity,operands,vliw_insn_value);
@@ -368,7 +368,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     default:
     	fprintf (stderr,"_print_insn: unrecognized insn type\n");
         info->fprintf_func(info->stream, "0x%08lx",high_bits);
-    	return DOUBLE_CMD_SIZE;
+    	return SINGLE_CMD_SIZE;
     }
 
 
