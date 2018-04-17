@@ -271,7 +271,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     // To disassemble from ELF we need "is_big_endian = 1",
     // while from target "is_big_endian = 0"; Some mechanism should be implemented
     // high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, is_big_endian);
-    high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, 1);
+    high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, 0);// 0 - disassemble target
 
     switch (get_instruction_type(high_bits)){
 
@@ -293,7 +293,11 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
           (*info->memory_error_func) (status, cur_pc + SINGLE_CMD_SIZE, info);
           return -1;
         }
-        low_bits = bfd_get_bits (instr_low_bytes, bits_per_word, 1);
+        // todo:
+        // To disassemble from ELF we need "is_big_endian = 1",
+        // while from target "is_big_endian = 0"; Some mechanism should be implemented
+        // high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, is_big_endian);
+        low_bits = bfd_get_bits (instr_low_bytes, bits_per_word, 0);// 0 - disassemble target
     	opcode_table = apex_APC_32b_scalar_opc_info;
     	scalar_insn_part = find_in_table_scalar_insn_part(opcode_table,high_bits);
      	opcode_table = apex_APC_32b_vector_opc_info;
