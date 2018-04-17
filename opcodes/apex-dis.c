@@ -271,7 +271,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     // To disassemble from ELF we need "is_big_endian = 1",
     // while from target "is_big_endian = 0"; Some mechanism should be implemented
     // high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, is_big_endian);
-    high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, 0);// 0 - disassemble target
+    high_bits = bfd_get_bits (instr_high_bytes, bits_per_word, 0);//0 - disassemble target
 
     switch (get_instruction_type(high_bits)){
 
