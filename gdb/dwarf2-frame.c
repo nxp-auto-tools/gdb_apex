@@ -1403,6 +1403,11 @@ dwarf2_frame_sniffer (const struct frame_unwind *self,
      address is placed on the stack by the OS, its FDE must
      extend one byte before its start address or we could potentially
      select the FDE of the previous function.  */
+	//APEX_SUPPORT
+	//As we don't have full CFA information we can't use it.
+	//In other case GDB don't try to use sniffing mechanizm as decided that CFA available
+	return 0;
+	//APEX_SUPPORT
   CORE_ADDR block_addr = get_frame_address_in_block (this_frame);
   struct dwarf2_fde *fde = dwarf2_frame_find_fde (&block_addr, NULL);
 
@@ -2103,12 +2108,22 @@ decode_frame_entry_1 (struct comp_unit *unit, const gdb_byte *start,
 
       addr = read_encoded_value (unit, fde->cie->encoding, fde->cie->ptr_size,
 				 buf, &bytes_read, 0);
+      //APEX_SUPPORT
+      //fde->initial_location = gdbarch_adjust_dwarf2_addr (gdbarch, addr);
+      addr *= 4;
       fde->initial_location = gdbarch_adjust_dwarf2_addr (gdbarch, addr);
+      //APEX_SUPPORT
+
       buf += bytes_read;
 
       fde->address_range =
 	read_encoded_value (unit, fde->cie->encoding & 0x0f,
 			    fde->cie->ptr_size, buf, &bytes_read, 0);
+
+      //APEX_SUPPORT
+      fde->address_range *= 4;
+      //APEX_SUPPORT
+
       addr = gdbarch_adjust_dwarf2_addr (gdbarch, addr + fde->address_range);
       fde->address_range = addr - fde->initial_location;
       buf += bytes_read;

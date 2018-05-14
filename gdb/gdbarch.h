@@ -1522,6 +1522,15 @@ typedef int (gdbarch_addressable_memory_unit_size_ftype) (struct gdbarch *gdbarc
 extern int gdbarch_addressable_memory_unit_size (struct gdbarch *gdbarch);
 extern void set_gdbarch_addressable_memory_unit_size (struct gdbarch *gdbarch, gdbarch_addressable_memory_unit_size_ftype *addressable_memory_unit_size);
 
+
+typedef CORE_ADDR (gdbarch_adjust_dwarf2_local_vars_ftype) (struct type* type, CORE_ADDR addr);
+extern CORE_ADDR gdbarch_adjust_dwarf2_local_vars (struct gdbarch *gdbarch, struct type* type, CORE_ADDR addr);
+extern void set_gdbarch_adjust_dwarf2_local_vars (struct gdbarch *gdbarch, gdbarch_adjust_dwarf2_local_vars_ftype *adjust_dwarf2_local_vars);
+
+typedef bool (gdbarch_adjust_dwarf2_symbol_ftype) (struct symbol *symbol);
+extern bool gdbarch_adjust_dwarf2_symbol (struct gdbarch *gdbarch, struct symbol *ginfo);
+extern void set_gdbarch_adjust_dwarf2_symbol (struct gdbarch *gdbarch, gdbarch_adjust_dwarf2_symbol_ftype *adjust_dwarf2_symbol);
+
 /* Definition for an unknown syscall, used basically in error-cases.  */
 #define UNKNOWN_SYSCALL (-1)
 

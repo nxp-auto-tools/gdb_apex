@@ -336,6 +336,8 @@ struct gdbarch
   gdbarch_gcc_target_options_ftype *gcc_target_options;
   gdbarch_gnu_triplet_regexp_ftype *gnu_triplet_regexp;
   gdbarch_addressable_memory_unit_size_ftype *addressable_memory_unit_size;
+  gdbarch_adjust_dwarf2_local_vars_ftype *adjust_dwarf2_local_vars;
+  gdbarch_adjust_dwarf2_symbol_ftype *adjust_dwarf2_symbol;
 };
 
 /* Create a new ``struct gdbarch'' based on information provided by
@@ -441,6 +443,7 @@ gdbarch_alloc (const struct gdbarch_info *info,
   gdbarch->gcc_target_options = default_gcc_target_options;
   gdbarch->gnu_triplet_regexp = default_gnu_triplet_regexp;
   gdbarch->addressable_memory_unit_size = default_addressable_memory_unit_size;
+  gdbarch->adjust_dwarf2_local_vars = default_adjust_dwarf2_local_vars;
   /* gdbarch_alloc() */
 
   return gdbarch;
@@ -4893,6 +4896,42 @@ set_gdbarch_addressable_memory_unit_size (struct gdbarch *gdbarch,
                                           gdbarch_addressable_memory_unit_size_ftype addressable_memory_unit_size)
 {
   gdbarch->addressable_memory_unit_size = addressable_memory_unit_size;
+}
+
+
+CORE_ADDR
+gdbarch_adjust_dwarf2_local_vars (struct gdbarch *gdbarch, struct type *type, CORE_ADDR address)
+{
+  gdb_assert (gdbarch != NULL);
+  gdb_assert (gdbarch->adjust_dwarf2_local_vars != NULL);
+  if (gdbarch_debug >= 2)
+    fprintf_unfiltered (gdb_stdlog, "gdbarch_adjust_dwarf2_local_vars called\n");
+  return gdbarch->adjust_dwarf2_local_vars (type, address);
+}
+
+void
+set_gdbarch_adjust_dwarf2_local_vars (struct gdbarch *gdbarch,
+                                gdbarch_adjust_dwarf2_local_vars_ftype adjust_dwarf2_local_vars)
+{
+  gdbarch->adjust_dwarf2_local_vars = adjust_dwarf2_local_vars;
+}
+
+
+bool
+gdbarch_adjust_dwarf2_symbol (struct gdbarch *gdbarch, struct symbol *symbol)
+{
+  gdb_assert (gdbarch != NULL);
+  gdb_assert (gdbarch->adjust_dwarf2_symbol != NULL);
+  if (gdbarch_debug >= 2)
+    fprintf_unfiltered (gdb_stdlog, "gdbarch_adjust_dwarf2_symbol called\n");
+  return gdbarch->adjust_dwarf2_symbol (symbol);
+}
+
+void
+set_gdbarch_adjust_dwarf2_symbol (struct gdbarch *gdbarch,
+                                gdbarch_adjust_dwarf2_symbol_ftype adjust_dwarf2_symbol)
+{
+  gdbarch->adjust_dwarf2_symbol = adjust_dwarf2_symbol;
 }
 
 
