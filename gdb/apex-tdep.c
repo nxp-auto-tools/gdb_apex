@@ -201,6 +201,10 @@ apex_read_lr (struct regcache* regcache){
 }
 */
 
+#define HW_PC_MASK 0x20000
+#define MAX_PC_VAL HW_PC_MASK - 1
+#define MEM_PC_TO_REG_PC(pc) (pc >= HW_PC_MASK) ? (pc & MAX_PC_VAL)*WORD2BYTE : pc
+
 /* Implement the "unwind_pc" gdbarch method.  */
 static CORE_ADDR
 apex_unwind_pc (struct gdbarch *gdbarch, struct frame_info *this_frame){
@@ -209,10 +213,8 @@ apex_unwind_pc (struct gdbarch *gdbarch, struct frame_info *this_frame){
 	  pc = frame_unwind_register_unsigned (this_frame, APEX_PC_REGNUM);
 	  //Little bit tricky. LR and PC reg values from the GDB server comes in bytes format and max value is 0x1FFFFF
 	  //so when we read value more than 0x20000 it means that value was stored in the memory (stack) and we need to convert it.
-	  if (pc >= 0x20000){
-		  pc = (pc - 0x20000)*WORD2BYTE;
-	  }
-	  return (CORE_ADDR)(pc&0x1FFFF);
+	  pc = MEM_PC_TO_REG_PC(pc);
+	  return (CORE_ADDR)(pc & MAX_PC_VAL);
 }
 
 /* Implement the "unwind_sp" gdbarch method.  */
@@ -221,7 +223,7 @@ apex_unwind_sp (struct gdbarch *gdbarch, struct frame_info *this_frame)
 {
 	ULONGEST sp;
 	sp = frame_unwind_register_unsigned (this_frame, APEX_SP_REGNUM);
-	return (CORE_ADDR)(sp&0x1FFFF) * WORD2BYTE;
+	return (CORE_ADDR)(sp & MAX_PC_VAL) * WORD2BYTE;
 }
 
 
@@ -526,7 +528,7 @@ apex_analyze_prologue (struct gdbarch *gdbarch,
         			int rd = cmd->args[0].value;
         			int rs = cmd->args[0].value;
         			if (cmd->arg_size == 2){
-        				if (rd == 31 /*sp*/){
+        				if (rd == APEX_SP_REGNUM){
         					if (is_sp_moved){
         						//ignore this and stop analyze
         						is_leaf = true;
@@ -965,17 +967,8 @@ static int
 apex_gdb_print_insn (bfd_vma memaddr, disassemble_info *info){
 	return print_insn_apex (memaddr, info);
 }
-/*
-static
-void apex_extended_remote_post_attach (struct target_ops *ops, int pid){
-    struct section_offsets *offsets;
-    
-    if (symfile_objfile == NULL)
-        return;
 
-    apex_objfile_relocate();
-}
-*/
+
 #define APEX_VIRTUAL_VEC_MEM 0x2000000
 void apex_objfile_relocate(){
 	CORE_ADDR text_addr, data_addr;

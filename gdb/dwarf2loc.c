@@ -2291,6 +2291,11 @@ const struct dwarf_expr_context_funcs dwarf_expr_ctx_funcs =
   dwarf_expr_get_obj_addr
 };
 
+/* Evaluate a location description, starting at DATA and with length
+   SIZE, to find the current location of variable of TYPE in the
+   context of FRAME.  BYTE_OFFSET is applied after the contents are
+   computed.  */
+
 
 static struct value *
 dwarf2_evaluate_loc_desc_full (struct type *type, struct frame_info *frame,
@@ -4571,6 +4576,7 @@ loclist_describe_location (struct symbol *symbol, CORE_ADDR addr,
   struct gdbarch *gdbarch = get_objfile_arch (objfile);
   //APEX_SUPPORT
   //elf contains data in BIG_ENDIAN but target in LITTLE_ENDIAN
+  //this required only for this part that reading information from the elf file.
   enum bfd_endian byte_order = BFD_ENDIAN_BIG; //gdbarch_byte_order (gdbarch);
   unsigned int addr_size = dwarf2_per_cu_addr_size (dlbaton->per_cu);
   int offset_size = dwarf2_per_cu_offset_size (dlbaton->per_cu);
