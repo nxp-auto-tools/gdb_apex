@@ -18353,6 +18353,7 @@ var_decode_location (struct attribute *attr, struct symbol *sym,
 		  == 1 + leb128_size (&DW_BLOCK (attr)->data[1])))))
     {
       unsigned int dummy;
+      struct gdbarch *gdbarch;
 
       if (DW_BLOCK (attr)->data[0] == DW_OP_addr)
 	SYMBOL_VALUE_ADDRESS (sym) =
@@ -18361,7 +18362,13 @@ var_decode_location (struct attribute *attr, struct symbol *sym,
 	SYMBOL_VALUE_ADDRESS (sym) =
 	  read_addr_index_from_leb128 (cu, DW_BLOCK (attr)->data + 1, &dummy);
       SYMBOL_ACLASS_INDEX (sym) = LOC_STATIC;
-      fixup_symbol_section (sym, objfile);
+
+      //APEX_SUPPORT
+      gdbarch = target_gdbarch ();
+      if (!gdbarch_adjust_dwarf2_symbol(gdbarch, sym)){
+    	  fixup_symbol_section (sym, objfile);
+      }
+      //APEX_SUPPORT
       SYMBOL_VALUE_ADDRESS (sym) += ANOFFSET (objfile->section_offsets,
 					      SYMBOL_SECTION (sym));
       return;
@@ -21951,7 +21958,9 @@ fill_in_loclist_baton (struct dwarf2_cu *cu,
      don't run off the edge of the section.  */
   baton->size = section->size - DW_UNSND (attr);
   baton->data = section->buffer + DW_UNSND (attr);
-  baton->base_address = cu->base_address;
+  //APEX_SUPPORT
+  baton->base_address = cu->base_address * 4;
+  //APEX_SUPPORT
   baton->from_dwo = cu->dwo_unit != NULL;
 }
 

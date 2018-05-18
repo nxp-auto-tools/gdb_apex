@@ -926,6 +926,11 @@ default_guess_tracepoint_registers (struct gdbarch *gdbarch,
   regcache_raw_supply (regcache, pc_regno, regs);
 }
 
+CORE_ADDR
+default_adjust_dwarf2_local_vars(struct type* type, CORE_ADDR addr){
+	return addr;
+}
+
 /* -Wmissing-prototypes */
 extern initialize_file_ftype _initialize_gdbarch_utils;
 

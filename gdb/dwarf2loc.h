@@ -307,4 +307,10 @@ extern int dwarf_reg_to_regnum (struct gdbarch *arch, int dwarf_reg);
 extern int dwarf_reg_to_regnum_or_error (struct gdbarch *arch,
 					 ULONGEST dwarf_reg);
 
+/*Helper function to adjust local variables
+ * For APEX it's required to relocate local vector variables in to the virtual memory.
+ * Which one recognized by the server and translating in to the memory space required by client
+ */
+extern CORE_ADDR dwarf_adjust_local_var(struct type *type, CORE_ADDR address);
+
 #endif /* dwarf2loc.h */

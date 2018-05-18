@@ -207,7 +207,9 @@ dwarf2_find_location_expression (struct dwarf2_loclist_baton *baton,
 {
   struct objfile *objfile = dwarf2_per_cu_objfile (baton->per_cu);
   struct gdbarch *gdbarch = get_objfile_arch (objfile);
-  enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);
+  //APEX_SUPPORT
+  //elf contains code in BIG_ENDIAN but target in LITTLE
+  enum bfd_endian byte_order = BFD_ENDIAN_BIG;//gdbarch_byte_order (gdbarch);
   unsigned int addr_size = dwarf2_per_cu_addr_size (baton->per_cu);
   int signed_addr_p = bfd_get_sign_extend_vma (objfile->obfd);
   /* Adjust base_address for relocatable objects.  */
@@ -2294,6 +2296,7 @@ const struct dwarf_expr_context_funcs dwarf_expr_ctx_funcs =
    context of FRAME.  BYTE_OFFSET is applied after the contents are
    computed.  */
 
+
 static struct value *
 dwarf2_evaluate_loc_desc_full (struct type *type, struct frame_info *frame,
 			       const gdb_byte *data, size_t size,
@@ -2430,7 +2433,11 @@ dwarf2_evaluate_loc_desc_full (struct type *type, struct frame_info *frame,
 		  ptr_type = builtin_type (ctx->gdbarch)->builtin_data_ptr;
 		  break;
 	      }
+
 	    address = value_as_address (value_from_pointer (ptr_type, address));
+
+	    address = gdbarch_adjust_dwarf2_local_vars(ctx->gdbarch, type, address);
+
 
 	    do_cleanups (value_chain);
 	    retval = value_at_lazy (type, address + byte_offset);
@@ -4567,7 +4574,10 @@ loclist_describe_location (struct symbol *symbol, CORE_ADDR addr,
   const gdb_byte *loc_ptr, *buf_end;
   struct objfile *objfile = dwarf2_per_cu_objfile (dlbaton->per_cu);
   struct gdbarch *gdbarch = get_objfile_arch (objfile);
-  enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);
+  //APEX_SUPPORT
+  //elf contains data in BIG_ENDIAN but target in LITTLE_ENDIAN
+  //this required only for this part that reading information from the elf file.
+  enum bfd_endian byte_order = BFD_ENDIAN_BIG; //gdbarch_byte_order (gdbarch);
   unsigned int addr_size = dwarf2_per_cu_addr_size (dlbaton->per_cu);
   int offset_size = dwarf2_per_cu_offset_size (dlbaton->per_cu);
   int signed_addr_p = bfd_get_sign_extend_vma (objfile->obfd);

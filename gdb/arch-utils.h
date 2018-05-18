@@ -211,4 +211,6 @@ extern void default_guess_tracepoint_registers (struct gdbarch *gdbarch,
 						struct regcache *regcache,
 						CORE_ADDR addr);
 
+CORE_ADDR default_adjust_dwarf2_local_vars(struct type* type, CORE_ADDR addr);
+
 #endif
