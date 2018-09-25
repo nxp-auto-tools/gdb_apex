@@ -158,7 +158,8 @@ value_subscript (struct value *array, LONGEST index)
       LONGEST lowerbound, upperbound;
 
       get_discrete_bounds (range_type, &lowerbound, &upperbound);
-      if (VALUE_LVAL (array) != lval_memory)
+      //in case of vector variable we need prefetch reading
+      if (VALUE_LVAL (array) != lval_memory || TYPE_VECTOR(tarray))
 	return value_subscripted_rvalue (array, index, lowerbound);
 
       if (c_style == 0)
@@ -214,7 +215,11 @@ value_subscripted_rvalue (struct value *array, LONGEST index, int lowerbound)
       address = value_address (array) + elt_offs;
       elt_type = resolve_dynamic_type (elt_type, NULL, address);
     }
-
+//APEX SUPPORT
+//prefetch reading of whole vector variable.
+  if (value_lazy(array))
+	  value_fetch_lazy(array);
+//APEX SUPPORT
   if (VALUE_LVAL (array) == lval_memory && value_lazy (array))
     v = allocate_value_lazy (elt_type);
   else
