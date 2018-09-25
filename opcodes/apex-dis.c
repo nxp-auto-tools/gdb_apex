@@ -355,7 +355,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
         const apex_64_bit_opc_info_t *vliw_opcode_table=apex_APC_64b_scalar_opc_info;
 
     	const apex_64_bit_opc_info_t *vliw_insn_entity = find_in_vliw_table(vliw_opcode_table,vliw_insn_value);
-        info->fprintf_func(stdout, "_vliw ");
+        //info->fprintf_func(stdout, "_vliw ");
 
         if (vliw_insn_entity != NULL){
         	extract_vliw_operands(vliw_insn_entity,operands,vliw_insn_value);
