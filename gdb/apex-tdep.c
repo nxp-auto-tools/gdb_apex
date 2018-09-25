@@ -210,10 +210,16 @@ static CORE_ADDR
 apex_unwind_pc (struct gdbarch *gdbarch, struct frame_info *this_frame){
 
 	  ULONGEST pc;
+	  ULONGEST dm_start,pm_start;
+
+	  struct regcache* regcache = get_current_regcache();
+	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start);
+	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_pm_start_regnum, &pm_start);
+
 	  pc = frame_unwind_register_unsigned (this_frame, APEX_PC_REGNUM);
 	  //Little bit tricky. LR and PC reg values from the GDB server comes in bytes format and max value is 0x1FFFFF
 	  //so when we read value more than 0x20000 it means that value was stored in the memory (stack) and we need to convert it.
-	  pc = MEM_PC_TO_REG_PC(pc);
+	  pc = ((pm_start > dm_start) & pc < pm_start) ? pc*WORD2BYTE:pc; /*MEM_PC_TO_REG_PC(pc);*/
 	  return (CORE_ADDR)(pc & MAX_PC_VAL);
 }
 
