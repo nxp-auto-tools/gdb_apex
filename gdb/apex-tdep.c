@@ -1036,7 +1036,7 @@ apex_adjust_dwarf_local_vars(struct type* type, CORE_ADDR addr){
 	if (is_vector(type)){
 		addr = addr * 32 + APEX_VIRTUAL_VEC_MEM;
 	}
-	return addr & (~3);
+	return addr & (~3UL);
 }
 
 
