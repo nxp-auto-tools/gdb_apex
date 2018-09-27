@@ -583,7 +583,8 @@ apex_analyze_prologue (struct gdbarch *gdbarch,
 	  cache->framesize = 0;
   }
 
-  if (sr_branch == true && pv_is_register_k (regs[APEX_LR_REGNUM], APEX_LR_REGNUM, 0)){
+  CORE_ADDR offset;
+  if (sr_branch == true && !pv_area_find_reg(stack, gdbarch, APEX_LR_REGNUM, &offset)){
 	  /* We're just out of luck.  No return function */
 	  /* Nobody saved LR register on stack and not a leaf function*/
 	  cache->framereg = -1;
@@ -591,8 +592,6 @@ apex_analyze_prologue (struct gdbarch *gdbarch,
   }
 
   for (i = 0; i < APEX_ACP_REGS_END; i++){
-      CORE_ADDR offset;
-
       if (pv_area_find_reg (stack, gdbarch, i, &offset))
     	  cache->saved_regs[i].addr = offset;
   }
