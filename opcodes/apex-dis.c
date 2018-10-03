@@ -146,7 +146,7 @@ int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operand
 			sprintf(value_string,"%d",operands[index].value);
 			break;
 		default:
-	        fprintf (stderr,"_compose_scalar_mnemonic: wrong operand type\n");
+	        fprintf (stdout,"_compose_scalar_mnemonic: wrong operand type\n");
 	        break;
 
 		}
@@ -173,7 +173,7 @@ int compose_64b_scalar_mnemonic (const apex_64_bit_opc_info_t* instruction,opera
 			sprintf(value_string,"%d",operands[index].value);
 			break;
 		default:
-	        fprintf (stderr,"_compose_scalar_mnemonic: wrong operand type\n");
+	        fprintf (stdout,"_compose_scalar_mnemonic: wrong operand type\n");
 	        break;
 
 		}
@@ -310,11 +310,11 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
         		scalar_result = compose_mnemonic(scalar_insn_part,operands,insns_mnemonic);
         		strcat(insns_mnemonic,"\n");
         	} else {
-                fprintf (stderr,"_print_insn_combined_: scalar operands extracted in wrong way; addr=0x%08lx\n",cur_pc);
+                fprintf (stdout,"_print_insn_combined_: scalar operands extracted in wrong way; addr=0x%08lx\n",cur_pc);
                 info->fprintf_func(info->stream, "0x%08lx ",high_bits);
         	}
         } else{
-            fprintf (stderr,"_print_insn_combined_: scalar insn part not found; addr=0x%08lx\n",cur_pc);
+            fprintf (stdout,"_print_insn_combined_: scalar insn part not found; addr=0x%08lx\n",cur_pc);
             info->fprintf_func(info->stream, "0x%08lx ",high_bits);
         }
 		compose_mnemonic = compose_vector_mnemonic;
@@ -326,13 +326,13 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 		        if(scalar_result>0)
 					info->fprintf_func(info->stream, " %s", insns_mnemonic);
 		        info->fprintf_func(info->stream, "0x%08lx ",low_bits);
-		        fprintf (stderr,"_print_insn_combined_: vector operands extracted in wrong way; addr=0x%08lx\n",cur_pc);
+		        fprintf (stdout,"_print_insn_combined_: vector operands extracted in wrong way; addr=0x%08lx\n",cur_pc);
 			}
 		} else {
 	        if(scalar_result>0)
 				info->fprintf_func(info->stream, " %s", insns_mnemonic);
 	        info->fprintf_func(info->stream, "0x%08lx ",low_bits);
-	        fprintf (stderr,"_print_insn_combined_: vector insn part not found; addr=0x%08lx;\n",cur_pc);
+	        fprintf (stdout,"_print_insn_combined_: vector insn part not found; addr=0x%08lx;\n",cur_pc);
 
 		}
 		return DOUBLE_CMD_SIZE;
@@ -355,7 +355,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
         const apex_64_bit_opc_info_t *vliw_opcode_table=apex_APC_64b_scalar_opc_info;
 
     	const apex_64_bit_opc_info_t *vliw_insn_entity = find_in_vliw_table(vliw_opcode_table,vliw_insn_value);
-        //info->fprintf_func(info->stream, "_vliw ");
+        //info->fprintf_func(stdout, "_vliw ");
 
         if (vliw_insn_entity != NULL){
         	extract_vliw_operands(vliw_insn_entity,operands,vliw_insn_value);
@@ -364,13 +364,13 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
         		return DOUBLE_CMD_SIZE;
         	}
         }
-        fprintf (stderr,"_print_insn_scalar_64b_: unparsed command with addr=0x%08lx\n",cur_pc);
+        fprintf (stdout,"_print_insn_scalar_64b_: unparsed command with addr=0x%08lx\n",cur_pc);
         info->fprintf_func(info->stream, "0x%08lx ",high_bits);
         info->fprintf_func(info->stream, "0x%08lx ",low_bits);
 		return DOUBLE_CMD_SIZE;
 
     default:
-    	fprintf (stderr,"_print_insn: unrecognized insn type\n");
+    	fprintf (stdout,"_print_insn: unrecognized insn type\n");
         info->fprintf_func(info->stream, "0x%08lx",high_bits);
     	return SINGLE_CMD_SIZE;
     }
@@ -386,7 +386,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     	}
     }
 
-    fprintf (stderr,"_print_insn: unparsed command with addr=0x%08lx\n",cur_pc);
+    fprintf (stdout,"_print_insn: unparsed command with addr=0x%08lx\n",cur_pc);
     info->fprintf_func(info->stream, "0x%08lx",high_bits);
 	return SINGLE_CMD_SIZE;
 }
