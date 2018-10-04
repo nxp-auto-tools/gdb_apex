@@ -535,13 +535,9 @@ apex_analyze_prologue (struct gdbarch *gdbarch,
         			int rs = cmd->args[0].value;
         			if (cmd->arg_size == 2){
         				if (rd == APEX_SP_REGNUM){
-        					if (is_sp_moved){
-        						//ignore this and stop analyze
-        						is_leaf = true;
-        					}else{
         						regs[rd] = pv_add_constant( regs[rs], cmd->args[1].value);
+        						if (is_sp_moved) is_leaf = true;
         						is_sp_moved = true;
-        					}
         				}else{
         					regs[rd] = pv_add_constant( regs[rs], cmd->args[1].value);
         				}
