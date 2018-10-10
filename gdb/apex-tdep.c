@@ -509,7 +509,7 @@ apex_analyze_prologue (struct gdbarch *gdbarch,
     struct pv_area *stack;
     struct cleanup *back_to;
     struct Command cmd[2];
-    bool is_leaf=false, is_sp_moved = false;
+    bool is_leaf=false, is_sp_moved = false, sr_branch = false;
     
     int i;
     for (i = 0; i < APEX_ACP_REGS_END; i++)
@@ -558,6 +558,7 @@ apex_analyze_prologue (struct gdbarch *gdbarch,
         		case branch:
         			//analyze delay slots and stop
         			limit = start + cmd->delay_slot * 4;
+        			sr_branch = true;
         			break;
 
         	}
@@ -577,9 +578,16 @@ apex_analyze_prologue (struct gdbarch *gdbarch,
       cache->framesize = -regs[APEX_SP_REGNUM].k;
       cache->framereg = APEX_SP_REGNUM;
   }else{
-      /* We're just out of luck.  We don't know where the frame is.  */
-      cache->framereg = -1;
-      cache->framesize = 0;
+	  /* We're just out of luck.  We don't know where the frame is.  */
+	  cache->framereg = -1;
+	  cache->framesize = 0;
+  }
+
+  if (sr_branch == true && pv_is_register_k (regs[APEX_LR_REGNUM], APEX_LR_REGNUM, 0)){
+	  /* We're just out of luck.  No return function */
+	  /* Nobody saved LR register on stack and not a leaf function*/
+	  cache->framereg = -1;
+	  cache->framesize = 0;
   }
 
   for (i = 0; i < APEX_ACP_REGS_END; i++){
