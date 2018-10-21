@@ -4,6 +4,7 @@
 #include "sysdep.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "dis-asm.h"
 #include "apex-opc.h"
 #include "apex-dis.h"
@@ -11,6 +12,8 @@
 
 #define SINGLE_CMD_SIZE 4
 #define DOUBLE_CMD_SIZE 8
+
+#define MAX_STR 255
 
 typedef struct operand{
 	int value;
@@ -31,6 +34,33 @@ extern const apex_opc_info_t apex_APC_32b_scalar_opc_info[];
 extern const apex_64_bit_opc_info_t apex_APC_64b_scalar_opc_info[];
 extern const apex_opc_info_t apex_APC_32b_vector_opc_info[];
 
+extern const char* vmul_op1[];
+extern const char* vmul_op2[];
+extern const char* vmul_op3[];
+extern const char* vmul_op4[];
+extern const char* vadd_op[];
+extern const char* vadd_op3[];
+extern const char* vcomp_op[];
+extern const char* vec_ldst_op1[];
+extern const char* vec_ldst_op2[];
+extern const char* vnop[];
+extern const char* vmov_op1[];
+extern const char* vmov_op2[];
+extern const char* vmov_op3[];
+
+extern const char* vsh_op1[];
+extern const char* vsh_op2[];
+extern const char* vsh_op3[];
+extern const char* vsh_op4[];
+extern const char* vsh_vc_op1[];
+extern const char* vsh_vc_op2[];
+extern const char* vsh_vc_op3[];
+extern const char* vswap_op[];
+extern const char* neg_op[];
+
+//extern const apex_opc_info_t apex_short_vadd_op_opc_info[];
+//extern const apex_opc_info_t apex_short_vmul_opc_info[];
+
 int get_instruction_type (bfd_vma instruction_word);
 const apex_opc_info_t* find_in_table (const apex_opc_info_t* table, bfd_vma insn_bits);
 const apex_opc_info_t* find_in_table_scalar_insn_part (const apex_opc_info_t* table, bfd_vma insn_bits);
@@ -38,10 +68,10 @@ const apex_opc_info_t* find_in_table_vector_insn_part (const apex_opc_info_t* ta
 const apex_64_bit_opc_info_t* find_in_vliw_table (const apex_64_bit_opc_info_t* table, vliw_t insn_bits);
 int extract_operands (const apex_opc_info_t* operation,operand* operands,bfd_vma insn_bits);
 int extract_vliw_operands (const apex_64_bit_opc_info_t* operation,operand* operands,vliw_t insn_bits);
-int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operands,char* string);
+int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operands,char* string, bool vliw);
 int compose_64b_scalar_mnemonic (const apex_64_bit_opc_info_t* instruction,operand* operands,char* string);
-int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operands,char* string);
-int (*compose_mnemonic) (const apex_opc_info_t* instruction,operand* operands,char* string);
+int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operands,char* string, bool vliw);
+int (*compose_mnemonic) (const apex_opc_info_t* instruction,operand* operands,char* string, bool vliw);
 
 int get_instruction_type (bfd_vma instruction_word){ //read first two bit in instruction
 	instruction_word &=0xc0000000;
@@ -127,10 +157,10 @@ int extract_vliw_operands (const apex_64_bit_opc_info_t* operation,operand* oper
 	return index;
 }
 
-int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string){
+int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string, bool vliw){
 	unsigned int index;
-	char value_string [12];
-	memset (value_string,0,12);
+	char value_string [MAX_STR];
+	memset (value_string,0,MAX_STR);
 	strcat(string, instruction->name);
 	for (index=0;index<instruction->num_of_operands;index++){
 		switch(operands[index].type){
@@ -141,6 +171,10 @@ int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operand
 			strcat(string," r");
 			sprintf(value_string,"%d",operands[index].value);
 			break;
+        case vreg_t:
+            strcat(string," v");
+			sprintf(value_string,"%d",operands[index].value);
+            break;  
 		case imm_t:
 			strcat(string," #");
 			sprintf(value_string,"%d",operands[index].value);
@@ -156,9 +190,12 @@ int compose_scalar_mnemonic (const apex_opc_info_t* instruction,operand* operand
 }
 int compose_64b_scalar_mnemonic (const apex_64_bit_opc_info_t* instruction,operand* operands, char* string){
 	unsigned int index;
-	char value_string [12];
-	memset (value_string,0,12);
+	char value_string [MAX_STR];
+	memset (value_string,0,MAX_STR);
 	strcat(string, instruction->name);
+	if (strlen(instruction->name) == 0){//combined instruction no name
+			strcat(string,".vliw_start");
+	}
 	for (index=0;index<instruction->num_of_operands;index++){
 		switch(operands[index].type){
 		case gap:
@@ -172,6 +209,26 @@ int compose_64b_scalar_mnemonic (const apex_64_bit_opc_info_t* instruction,opera
 			strcat(string," #");
 			sprintf(value_string,"%d",operands[index].value);
 			break;
+        
+                
+        case valu_short_t:
+                find_and_compose(apex_short_valu_op_opc_info, operands[index].value, string);
+                break;
+        case vmul_short_t:
+                find_and_compose(apex_short_vmul_op_opc_info, operands[index].value, string);
+                break;
+        case vsh_short_t:
+                find_and_compose(apex_short_vsh_op_opc_info, operands[index].value, string);
+                break;
+        case vldst_short_t:
+                find_and_compose(apex_short_vldst_op_opc_info, operands[index].value, string);
+                break;
+        case vldst2_short_t:
+                find_and_compose(apex_short_vldst2_op_opc_info, operands[index].value, string);
+                break;
+        case vswap_short_t:
+                find_and_compose(apex_short_vswap_op_opc_info, operands[index].value, string);
+                break;
 		default:
 	        fprintf (stdout,"_compose_scalar_mnemonic: wrong operand type\n");
 	        break;
@@ -179,16 +236,46 @@ int compose_64b_scalar_mnemonic (const apex_64_bit_opc_info_t* instruction,opera
 		}
 	strcat(string,value_string);
 	}
+	if (strlen(instruction->name) == 0){//combined instruction no name
+		strcat(string,"\n.vliw_end");
+	}
 	return strlen(string);
 }
 
-int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string){
+void find_and_compose(const apex_opc_info_t* opc_table, bfd_vma instruction, char* string){
+	operand opr[MAX_OPERANDS];
+    const apex_opc_info_t *table;
+	memset(opr, 0, MAX_OPERANDS*sizeof(opr[0]));
+
+	table = find_in_table(opc_table,instruction);
+    if (table != NULL){
+    	if (extract_operands(table, opr, instruction) != 0){
+    		compose_vector_mnemonic(table, opr, string, true);
+    		//strcat(string, "\n");
+    	}else{
+    		strcat(string,"\n");
+    		strcat(string,table->name);//nope instruction
+    	}
+	}else{
+		strcat(string, "\n__compose error");
+	}
+}
+
+int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operands, char* string, bool vliw){
 	unsigned int index;
 	int imm;
-	char value_string [12];
-	memset (value_string,0,12);
+	char value_string [MAX_STR];
+	memset (value_string,0,MAX_STR);
+
+    if (vliw==true && strlen(instruction->name) != 0){
+        strcat(string, "\n");
+    }
 	strcat(string, instruction->name);
+	if (strlen(instruction->name) == 0 && vliw == false){//combined instruction no name
+		strcat(string,".vliw_start");
+	}
 	for (index=0;index<instruction->num_of_operands;index++){
+		memset (value_string,0,MAX_STR);
 		switch(operands[index].type){
 		case gap:
 			strcat(string," _g_");
@@ -197,6 +284,10 @@ int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operand
 			strcat(string," r");
 			sprintf(value_string,"%d",operands[index].value);
 			break;
+        case vreg_t:
+            strcat(string," v");
+			sprintf(value_string,"%d",operands[index].value);
+            break;                
 		case imm_t:
 			strcat(string," #");
 			sprintf(value_string,"%d",operands[index].value);
@@ -216,9 +307,7 @@ int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operand
 			}
 			strcat(string," #");
 			sprintf(value_string,"%d",imm);
-
 		break;
-
 		case vcs_t:
 			strcat(string," vcs");
 			sprintf(value_string,"%s", vcs_str[operands[index].value]);
@@ -234,9 +323,129 @@ int compose_vector_mnemonic (const apex_opc_info_t* instruction,operand* operand
 			strcat(string," sel");
 			sprintf(value_string,"%d",operands[index].value);
 			break;
+        case vadd_op_t:
+        	strcat(string, "\n");
+            strcat(string, vadd_op[operands[index].value]);
+            break;
+        case vadd_op3_t:
+        	strcat(string, "\n");
+            strcat(string, vadd_op3[operands[index].value]);
+            break;
+        case vmul_op1_t:
+        	strcat(string, "\n");
+            strcat(string, vmul_op1[operands[index].value]);
+            break;
+        case vmul_op2_t:
+        	strcat(string, "\n");
+            strcat(string, vmul_op2[operands[index].value]);
+            break;
+        case vmul_op3_t:
+        	strcat(string, "\n");
+            strcat(string, vmul_op3[operands[index].value]);
+            break;
+        case vmul_op4_t:
+        	strcat(string, "\n");
+            strcat(string, vmul_op4[operands[index].value]);
+            break;
+        case vcomp_op_t:
+        	strcat(string, "\n");
+            strcat(string, vcomp_op[operands[index].value]);
+            break;
+        case vec_ldst_op1_t:
+        	strcat(string, "\n");
+            strcat(string, vec_ldst_op1[operands[index].value]);
+            break;
+        case vec_ldst_op2_t:
+        	strcat(string, "\n");
+            strcat(string, vec_ldst_op2[operands[index].value]);
+            break;
+        case vnop_t:
+        	strcat(string, "\n");
+            strcat(string, vnop[0]);
+            break;
+        case vmov_op1_t:
+        	strcat(string, "\n");
+            strcat(string, vmov_op1[operands[index].value]);
+            break;
+        case vmov_op2_t:
+        	strcat(string, "\n");
+            strcat(string, vmov_op2[operands[index].value]);
+            break;
+        case vmov_op3_t:
+        	strcat(string, "\n");
+            strcat(string, vmov_op3[operands[index].value]);
+            break;
+                
+        case vsh_op1_t:
+        	strcat(string, "\n");
+            strcat(string, vsh_op1[operands[index].value]);
+            break;
+        case vsh_op2_t:
+        	strcat(string, "\n");
+            strcat(string, vsh_op2[operands[index].value]);
+            break;
+        case vsh_op3_t:
+        	strcat(string, "\n");
+            strcat(string, vsh_op3[operands[index].value]);
+            break;
+        case vsh_op4_t:
+        	strcat(string, "\n");
+            strcat(string, vsh_op4[operands[index].value]);
+            break;
+                
+        case vsh_vc_op1_t:
+        	strcat(string, "\n");
+            strcat(string, vsh_vc_op1[operands[index].value]);
+            break;
+        case vsh_vc_op2_t:
+        	strcat(string, "\n");
+            strcat(string, vsh_vc_op2[operands[index].value]);
+            break;
+        case vsh_vc_op3_t:
+        	strcat(string, "\n");
+            strcat(string, vsh_vc_op3[operands[index].value]);
+            break;
+        case vswap_op_t:
+        	strcat(string, "\n");
+            strcat(string, vswap_op[operands[index].value]);
+            break;
+        case neg_op_t:
+            strcat(string, "\n");
+            strcat(string, neg_op[operands[index].value]);
+            break;
+                
+        case int5_t:{
+            signed char t = operands[index].value;
+            t = (t & 0x10) ? (t|0xF0) : t;
+            sprintf(value_string," %d(#%d)",t, operands[index].value);
+            }
+            break;
+        case int12_t:{
+            signed short t = operands[index].value;
+            t = (t & 0x800) ? (t|0xF000) : t;
+            sprintf(value_string," %d(#%d)",t, operands[index].value);
+            }
+            break;
+        case vcreg_t:
+            strcat(string," vc");
+			sprintf(value_string,"%d",operands[index].value);
+            break;               
+/*                
+        case vadd_cmd:
+        	find_and_compose(apex_short_vadd_op_opc_info, operands[index].value, string);
+            break;
+        case vmull_cmd:
+        	find_and_compose(apex_short_vmul_opc_info, operands[index].value, string);
+            break;
+*/            
 		}
 	strcat(string,value_string);
 	}
+
+	if (strlen(instruction->name) == 0 && vliw == false){//combined instruction no name
+		strcat(string,"\n.vliw_end");
+	}
+
 	return strlen(string);
 }
 
@@ -251,11 +460,11 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 	bfd_byte instr_high_bytes [bytes_per_word];
 	const apex_opc_info_t *opcode_table;
 	const apex_opc_info_t *current_instruction,*scalar_insn_part,*vector_insn_part;
-	operand operands[6];
+	operand operands[MAX_OPERANDS];
 	char insns_mnemonic[mnemomic_string_len];
 
 	memset(insns_mnemonic,0,mnemomic_string_len);
-	memset(operands,0,5*sizeof(operands[0]));
+	memset(operands,0,MAX_OPERANDS*sizeof(operands[0]));
 
     // read instruction-word at address pointed by "pc"
 	int status = (*info->read_memory_func) (cur_pc, instr_high_bytes,
@@ -307,7 +516,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
     	int scalar_result = 0;
         if (scalar_insn_part != NULL){
         	if(extract_operands(scalar_insn_part,operands,high_bits)==scalar_insn_part->num_of_operands){
-        		scalar_result = compose_mnemonic(scalar_insn_part,operands,insns_mnemonic);
+        		scalar_result = compose_mnemonic(scalar_insn_part,operands,insns_mnemonic,false);
         		strcat(insns_mnemonic,"\n");
         	} else {
                 fprintf (stdout,"_print_insn_combined_: scalar operands extracted in wrong way; addr=0x%08lx\n",cur_pc);
@@ -320,7 +529,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 		compose_mnemonic = compose_vector_mnemonic;
 		if (vector_insn_part != NULL){
 			if(extract_operands(vector_insn_part,operands,high_bits)==vector_insn_part->num_of_operands){
-				compose_mnemonic(vector_insn_part,operands,insns_mnemonic);
+				compose_mnemonic(vector_insn_part,operands,insns_mnemonic,false);
 				info->fprintf_func(info->stream, " %s", insns_mnemonic);
 			} else {
 		        if(scalar_result>0)
@@ -380,7 +589,7 @@ print_insn_apex(bfd_vma cur_insn_addr, disassemble_info *info){
 
     if (current_instruction != NULL){
     	extract_operands(current_instruction,operands,high_bits);
-    	if(compose_mnemonic(current_instruction,operands,insns_mnemonic)>0){
+    	if(compose_mnemonic(current_instruction,operands,insns_mnemonic, false)>0){
     		info->fprintf_func(info->stream,"%s", insns_mnemonic);
     		return SINGLE_CMD_SIZE;
     	}
