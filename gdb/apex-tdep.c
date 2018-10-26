@@ -212,14 +212,13 @@ apex_unwind_pc (struct gdbarch *gdbarch, struct frame_info *this_frame){
 	  ULONGEST pc;
 	  ULONGEST dm_start,pm_start;
 
-	  struct regcache* regcache = get_current_regcache();
-	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_dm_start_regnum, &dm_start);
-	  regcache_cooked_read_unsigned (regcache, cmem_if_apu_pm_start_regnum, &pm_start);
-
 	  pc = frame_unwind_register_unsigned (this_frame, APEX_PC_REGNUM);
 	  //Little bit tricky. LR and PC reg values from the GDB server comes in bytes format and max value is 0x1FFFFF
 	  //so when we read value more than 0x20000 it means that value was stored in the memory (stack) and we need to convert it.
-	  pc = ((pm_start > dm_start) & pc < pm_start) ? pc*WORD2BYTE:pc; /*MEM_PC_TO_REG_PC(pc);*/
+	  pc = pc >> 2; //all values in regs mult on 4 in memory not
+	  pc = (pc > MAX_PC_VAL) ? pc & MAX_PC_VAL: pc; //reg val conversion
+	  pc = pc * WORD2BYTE;// align back.
+	  pc = MEM_PC_TO_REG_PC(pc); //this value from stack
 	  return (CORE_ADDR)(pc & MAX_PC_VAL);
 }
 
@@ -334,10 +333,10 @@ struct Instruction isa_scalar[] ={
 	{scalar, add, 0, {b32, 0x3FE00000, 0x06200000}, 2, { /*adduix d1,s1,imm*/
 			{screg, 1, {SIZE(5), OFFSET(16), 0}}, {sval16bit, 1, {SIZE(16), OFFSET(0), 0}}}},
 
-	{scalar, branch, 2, {b32, 0x3E000000, 0x08000000}, 2, { /*beqz s1,#imm*/
-		{screg, 1, {SIZE(5), OFFSET(16), 0}}, {sval16bit, 1, {SIZE(16), OFFSET(0), 0}}}},
-	{scalar, branch, 2, {b32, 0x3E000000, 0x0A000000}, 2, { /*bnez s1,#imm*/
-		{screg, 1, {SIZE(5), OFFSET(16), 0}}, {sval16bit, 1, {SIZE(16), OFFSET(0), 0}}}},
+//	{scalar, branch, 2, {b32, 0x3E000000, 0x08000000}, 2, { /*beqz s1,#imm*/
+//		{screg, 1, {SIZE(5), OFFSET(16), 0}}, {sval16bit, 1, {SIZE(16), OFFSET(0), 0}}}},
+//	{scalar, branch, 2, {b32, 0x3E000000, 0x0A000000}, 2, { /*bnez s1,#imm*/
+//		{screg, 1, {SIZE(5), OFFSET(16), 0}}, {sval16bit, 1, {SIZE(16), OFFSET(0), 0}}}},
 
 	{scalar, branch, 1, {b32, 0x3E000000, 0x10000000}, 1,  /*j #imm*/
 			{sval25bit, 1, {SIZE(25), OFFSET(0), 0}}},
@@ -1058,11 +1057,13 @@ apex_adjust_dwarf_symbol(struct symbol *symbol){
 	}
 
 	for (int i = 0; i < symfile_objfile->num_sections; i++){
-		if (strcmp(symfile_objfile->sections[i].the_bfd_section->name,".vdata.VMb") == 0){
-			symbol->ginfo.value.ivalue *= 32;
-			symbol->ginfo.value.ivalue += symfile_objfile->sections[i].the_bfd_section->vma;
-			symbol->ginfo.section = i;
-			return true;
+		if (symfile_objfile->sections[i].the_bfd_section != NULL){
+			if (strcmp(symfile_objfile->sections[i].the_bfd_section->name,".vdata.VMb") == 0){
+				symbol->ginfo.value.ivalue *= 32;
+				symbol->ginfo.value.ivalue += symfile_objfile->sections[i].the_bfd_section->vma;
+				symbol->ginfo.section = i;
+				return true;
+			}
 		}
 	}
 
