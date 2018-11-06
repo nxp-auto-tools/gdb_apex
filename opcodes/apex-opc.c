@@ -152,6 +152,7 @@ const apex_opc_info_t apex_APC_32b_scalar_opc_info[] =
 	{       	/*On-Chip debugger Instructions*/
 			 "mv", 0x0000002EUL, 1, {reg_t,gap,gap,		gap,gap}, {0x1F,0,0,0,0},			{15,0,0,0,0},	0x1F07F00},
 	{     "sltui", 0x0000002DUL, 1, {reg_t,gap,gap,		gap,gap}, {0x1F,0,0,0,0},			{20,0,0,0,0},	0xFFF00},
+    
 	{ 		 NULL, 0,			0, {0,0,0,0,0},					  {0,0,0,0,0},				{0,0,0,0,0},	0}
 };
 
@@ -402,6 +403,61 @@ const apex_opc_info_t apex_APC_32b_vector_opc_info[] =
 	{      "vsel", 0x54000400UL, 5, {reg_t,reg_t,reg_t,f_t,reg_t},	{0x7,0x7,0x1F,0x1,0x3},		{11,17,20,14,15},0x7},
 	{     "vsleu", 0x400004D8UL, 4, {reg_t,reg_t,reg_t,reg_t,gap},	{0x3,0x7,0x1F,0x7,0},		{22,19,14,11,0},0x1003800},
 	{     "vsltu", 0x400004E0UL, 4, {reg_t,reg_t,reg_t,reg_t,gap},	{0x3,0x7,0x1F,0x7,0},		{22,19,14,11,0},0x1003800},
+    
+ 
+      {          "", 0x56000000UL, 4, {vadd_op_t,reg_t,vreg_t, vmul_op2_t,gap},                 {0x7,0x7,0x7, 0xF,0,0,0},       {21,18,15, 9,0,0,0}, 0},
+      {          "", 0x57000000UL, 4, {vadd_op_t,reg_t,reg_t,  vmul_op2_t,gap},                 {0x7,0x7,0x7, 0xF,0,0,0},       {21,18,15, 9,0,0,0}, 0},
+      {          "", 0x56000000UL, 7, {vadd_op_t,reg_t,vreg_t, vmul_op2_t,reg_t,vreg_t,vreg_t}, {0x7,0x7,0x7, 0xF,0x7,0x7,0x7}, {21,18,15, 9,6,3,0}, 0},
+      {          "", 0x56004000UL, 7, {vadd_op_t,reg_t,vreg_t, vmul_op2_t,reg_t,vreg_t,reg_t},  {0x7,0x7,0x7, 0xF,0x7,0x7,0xF}, {21,18,15, 10,7,4,0},0},
+      {          "", 0x56002000UL, 7, {vadd_op_t,reg_t,vreg_t, vmul_op3_t,reg_t,vreg_t,reg_t},  {0x7,0x7,0x7, 0x7,0x7,0x7,0xF}, {21,18,15, 10,7,4,0},0},
+      {          "", 0x57000000UL, 7, {vadd_op_t,reg_t,reg_t,  vmul_op2_t,reg_t,vreg_t,vreg_t}, {0x7,0x7,0x7, 0xF,0x7,0x7,0x7}, {21,18,15, 9,6,3,0}, 0},
+      {          "", 0x57004000UL, 7, {vadd_op_t,reg_t,reg_t,  vmul_op2_t,reg_t,vreg_t,reg_t},  {0x7,0x7,0x7, 0xF,0x7,0x7,0xF}, {21,18,15, 10,7,4,0},0},
+      {          "", 0x57002000UL, 7, {vadd_op_t,reg_t,reg_t,  vmul_op3_t,reg_t,vreg_t,reg_t},  {0x7,0x7,0x7, 0xF,0x7,0x7,0xF}, {21,18,15, 10,7,4,0},0},
+    
+      {          "", 0x58000000UL, 8, {vadd_op3_t,vreg_t,vreg_t,vreg_t, vmul_op4_t,reg_t,vreg_t,reg_t}, {0x7,0x7,0x7,0x7,0x7,0x7,0x7,0xF}, {22,19,16,13, 10,7,4,0},0},
+    
+      {          "", 0x5A000000UL, 8, {vadd_op3_t,vreg_t,vreg_t,vreg_t, vmul_op1_t,reg_t,vreg_t,vreg_t}, {0x7,0x7,0x7,0x7,0x7,0x7,0x7,0x7}, {22,19,16,13, 9,6,3,0},0x1000},
+    
+      {          "", 0x5E000000UL, 8, {vadd_op_t,reg_t,vreg_t,vreg_t, vcomp_op_t,imm_t,vreg_t,vreg_t}, {0x7,0x7,0x7,0x7,0x7,0x3,0x7,0x7}, {21,18,15,12, 8,6,3,0},0},
+      {          "", 0x5E000800UL, 8, {vadd_op_t,reg_t,vreg_t,vreg_t, vcomp_op_t,imm_t,vreg_t,reg_t},  {0x7,0x7,0x7,0x7,0x7,0x3,0x7,0x7}, {21,18,15,12, 8,6,3,0},0},
+      {          "", 0x5F000000UL, 8, {vadd_op_t,reg_t,vreg_t,reg_t,  vcomp_op_t,imm_t,vreg_t,vreg_t}, {0x7,0x7,0x7,0x7,0x7,0x3,0x7,0x7}, {21,18,15,12, 8,6,3,0},0},
+      {          "", 0x5F000800UL, 8, {vadd_op_t,reg_t,vreg_t,reg_t,  vcomp_op_t,imm_t,vreg_t,reg_t},  {0x7,0x7,0x7,0x7,0x7,0x3,0x7,0x7}, {21,18,15,12, 8,6,3,0},0},
+    
+      {          "", 0x5C000000UL, 4, {vadd_op_t,reg_t,vreg_t,  vnop_t},                      {0x7,0x7,0x7, 0x1},              {21,18,15, 11},      0x47FF},//nop
+      {          "", 0x5D000000UL, 4, {vadd_op_t,reg_t,reg_t,   vnop_t},                      {0x7,0x7,0x7, 0x1},              {21,18,15, 11},      0x47FF},//nop
+      {          "", 0x5C002000UL, 7, {vadd_op_t,reg_t,vreg_t,  vec_ldst_op1_t,vreg_t,reg_t,int5_t},  {0x7,0x7,0x7, 0x3,0x7,0x7,0x1F}, {21,18,15, 11,8,5,0},0x4000},
+      {          "", 0x5D002000UL, 7, {vadd_op_t,reg_t,reg_t,   vec_ldst_op1_t,vreg_t,reg_t,int5_t},  {0x7,0x7,0x7, 0x3,0x7,0x7,0x1F}, {21,18,15, 11,8,5,0},0x4000},
+      {          "", 0x5C000000UL, 7, {vadd_op_t,reg_t,vreg_t,  vec_ldst_op2_t,vreg_t,reg_t,int5_t},  {0x7,0x7,0x7, 0x3,0x7,0x7,0x1F}, {21,18,15, 11,8,5,0},0x4000},
+      {          "", 0x5D000000UL, 7, {vadd_op_t,reg_t,reg_t,   vec_ldst_op2_t,vreg_t,reg_t,int5_t},  {0x7,0x7,0x7, 0x3,0x7,0x7,0x1F}, {21,18,15, 11,8,5,0},0x4000},
+    
+      {          "", 0x62000000UL, 8, {vadd_op3_t,vreg_t,vreg_t,vreg_t,  vmov_op1_t,vreg_t,vreg_t,vreg_t},  {0x1,0x7,0x7,0x7, 0x1,0x7,0x7,0x7},  {24,21,18,15, 11,8,5,0}, 0x18},
+      {          "", 0x62001000UL, 8, {vadd_op3_t,vreg_t,vreg_t,vreg_t,  vmov_op2_t,vreg_t,vreg_t,reg_t },  {0x1,0x7,0x7,0x7, 0x1,0x7,0x7,0x1F}, {24,21,18,15, 11,8,5,0}, 0},
+      {          "", 0x62002000UL, 7, {vadd_op3_t,vreg_t,vreg_t,vreg_t,  vmov_op3_t,vreg_t,reg_t        },  {0x1,0x7,0x7,0x7, 0x2,0x7,0x1F},     {24,21,18,15, 11,8,3},   0x7},
+    
+      
+      {          "", 0x61003F20UL, 5, {vadd_op_t,reg_t,reg_t,   vsh_vc_op3_t,vcreg_t},           {0x7,0x7,0x7, 0x1,0x3},         {21,18,15,  6,3},      0x4007},
+      {          "", 0x60003F20UL, 5, {vadd_op_t,reg_t,vreg_t,  vsh_vc_op3_t,vcreg_t},           {0x7,0x7,0x7, 0x1,0x3},         {21,18,15,  6,3},      0x4007},
+      {          "", 0x61003C00UL, 4, {vadd_op_t,reg_t,reg_t,   vnop_t},                         {0x7,0x7,0x7, 0x1},             {21,18,15,  0},        0x41ff},
+      {          "", 0x60003C00UL, 4, {vadd_op_t,reg_t,vreg_t,  vnop_t},                         {0x7,0x7,0x7, 0x1},             {21,18,15,  0},        0x41ff},
+      {          "", 0x61003F00UL, 5, {vadd_op_t,reg_t,reg_t,   vsh_vc_op3_t,imm_t},             {0x7,0x7,0x7, 0x1,0x3},         {21,18,15,  6,3},      0x4007},
+      {          "", 0x60003F00UL, 5, {vadd_op_t,reg_t,vreg_t,  vsh_vc_op3_t,imm_t},             {0x7,0x7,0x7, 0x1,0x3},         {21,18,15,  6,3},      0x4007},
+      {          "", 0x61003E80UL, 6, {vadd_op_t,reg_t,reg_t,   vsh_vc_op2_t,reg_t,vcreg_t},     {0x7,0x7,0x7, 0x1,0x7,0x3},     {21,18,15,  6,3,0},    0x4004},
+      {          "", 0x60003E80UL, 6, {vadd_op_t,reg_t,vreg_t,  vsh_vc_op2_t,reg_t,vcreg_t},     {0x7,0x7,0x7, 0x1,0x7,0x3},     {21,18,15,  6,3,0},    0x4004},
+      {          "", 0x61003E80UL, 6, {vadd_op_t,reg_t,reg_t,   vsh_vc_op2_t,vcreg_t,vreg_t},    {0x7,0x7,0x7, 0x1,0x3,0x7},     {21,18,15,  6,3,0},    0x4020},
+      {          "", 0x60003E80UL, 6, {vadd_op_t,reg_t,vreg_t,  vsh_vc_op2_t,vcreg_t,vreg_t},    {0x7,0x7,0x7, 0x1,0x3,0x7},     {21,18,15,  6,3,0},    0x4020},
+      {          "", 0x61003E00UL, 6, {vadd_op_t,reg_t,reg_t,   vsh_vc_op1_t,reg_t,vreg_t},      {0x7,0x7,0x7, 0x1,0x7,0x7},     {21,18,15,  6,3,0},    0x4000},
+      {          "", 0x60003E00UL, 6, {vadd_op_t,reg_t,vreg_t,  vsh_vc_op1_t,reg_t,vreg_t},      {0x7,0x7,0x7, 0x1,0x7,0x7},     {21,18,15,  6,3,0},    0x4000},
+      {          "", 0x61002000UL, 7, {vadd_op_t,reg_t,reg_t,   vsh_op4_t,reg_t,vreg_t,reg_t},   {0x7,0x7,0x7, 0x3,0x7,0x7,0xF}, {21,18,15,  10,7,4,0}, 0x4000},
+      {          "", 0x60002000UL, 7, {vadd_op_t,reg_t,vreg_t,  vsh_op4_t,reg_t,vreg_t,reg_t},   {0x7,0x7,0x7, 0x3,0x7,0x7,0xF}, {21,18,15,  10,7,4,0}, 0x4000},
+      {          "", 0x61001000UL, 7, {vadd_op_t,reg_t,reg_t,   vsh_op3_t,reg_t,vreg_t,reg_t},   {0x7,0x7,0x7, 0x3,0x7,0x7,0xF}, {21,18,15,  10,7,4,0}, 0x4000},
+      {          "", 0x60001000UL, 7, {vadd_op_t,reg_t,vreg_t,  vsh_op3_t,reg_t,vreg_t,reg_t},   {0x7,0x7,0x7, 0x3,0x7,0x7,0xF}, {21,18,15,  10,7,4,0}, 0x4000},
+      {          "", 0x61003000UL, 7, {vadd_op_t,reg_t,reg_t,   vsh_op2_t,reg_t,vreg_t,imm_t},   {0x7,0x7,0x7, 0x3,0x7,0x7,0xF}, {21,18,15,  10,7,4,0}, 0x4000},
+      {          "", 0x60003000UL, 7, {vadd_op_t,reg_t,vreg_t,  vsh_op2_t,reg_t,vreg_t,imm_t},   {0x7,0x7,0x7, 0x3,0x7,0x7,0xF}, {21,18,15,  10,7,4,0}, 0x4000},
+      {          "", 0x61000000UL, 7, {vadd_op_t,reg_t,reg_t,   vsh_op1_t,reg_t,vreg_t,vreg_t},  {0x7,0x7,0x7, 0x3,0x7,0x7,0x7}, {21,18,15,  10,7,4,1}, 0x4001},
+      {          "", 0x60000000UL, 7, {vadd_op_t,reg_t,vreg_t,  vsh_op1_t,reg_t,vreg_t,vreg_t},  {0x7,0x7,0x7, 0x3,0x7,0x7,0x7}, {21,18,15,  10,7,4,1}, 0x4001},
+      
+      
+     
 	{ 		 NULL, 0,			0, {0,0,0,0,0,0},					{0,0,0,0,0,0},				{0,0,0,0,0,0},	0}
 };
 
@@ -425,7 +481,325 @@ const apex_64_bit_opc_info_t apex_APC_64b_scalar_opc_info[] =
 	{       "and", 0xF4A0000000000000ULL, 6, {reg_t,reg_t,reg_t,reg_t,reg_t,reg_t}, {0x1F,0x1F,0x1F,0x1F,0x1F,0x1F}, {47,42,37,32,27,22},0x3FFFFF},
 	{        "or", 0xF4B0000000000000ULL, 6, {reg_t,reg_t,reg_t,reg_t,reg_t,reg_t}, {0x1F,0x1F,0x1F,0x1F,0x1F,0x1F}, {47,42,37,32,27,22},0x3FFFFF},
 	{       "xor", 0xF4C0000000000000ULL, 6, {reg_t,reg_t,reg_t,reg_t,reg_t,reg_t}, {0x1F,0x1F,0x1F,0x1F,0x1F,0x1F}, {47,42,37,32,27,22},0x3FFFFF},
+    
+    {       "",    0xC000000000000000ULL, 4, {valu_short_t,vmul_short_t,vsh_short_t,vldst_short_t}, {0x3FFF, 0x7FFF, 0x3FFF, 0x3FFF},    {43,28,14,0}, 0},
+    {       "",    0xC800000000000000ULL, 3, {valu_short_t, vmul_short_t,  vldst2_short_t},            {0x3FFF, 0x7FFF, 0xFFFFFFF}, {43,28,0},     0},
+    {       "",    0xE000000000000000ULL, 3, {valu_short_t, vswap_short_t, vldst2_short_t},            {0x3FFF, 0x7FFF, 0xFFFFFFF}, {43,28,0},     0},
+    
+//  {          "", 0x56000000UL, 2, {vadd_cmd,vmull_cmd,gap,gap,gap},{0x3FF,0x7FFF,0,0,0},  {15, 0,0,0,0},  0},//packed instructions
+//  {          "", 0x58000000UL, 2, {vadd_op3_cmd,vmull_op4_cmd,gap,gap,gap},{0xFFF,0x1FFF,0,0,0},  {13, 0,0,0,0},  0},//packed instructions
+    
 	{ 		 NULL, 0,			        0, {0,0,0,0,0,0},					{0,0,0,0,0,0},				{0,0,0,0,0,0},	0}
 
 };
 
+//valu_short 14bit
+const apex_opc_info_t apex_short_valu_op_opc_info[] ={
+    { "vnop", 0x0000, 0,{ gap },{0}, {0}, 0xFFF},
+    { "",     0x3000, 4,{vadd_op_t, reg_t, vreg_t, vreg_t},{0x7, 0x7, 0x7, 0x7}, {9, 6,3,0}, 0},
+    { "",     0x2000, 4,{vadd_op_t, reg_t, vreg_t, reg_t },{0x7, 0x7, 0x7, 0x7}, {9, 6,3,0}, 0},
+    { 		 NULL, 0,			        0, {0,0,0,0,0,0},					{0,0,0,0,0,0},				{0,0,0,0,0,0},	0}
+};
+
+//vmul_short 15bit
+const apex_opc_info_t apex_short_vmul_op_opc_info[] = {
+    { "vnop", 0x0000, 0,{ gap }, {0}, {0}, 0},
+    { "",     0x2000, 4,{vmul_op3_t, reg_t, vreg_t, reg_t},   {0x7, 0x7, 0x7, 0xF}, {10, 7,4,0}, 0},
+    { "",     0x4000, 4,{vmul_op2_t, reg_t, vreg_t, vreg_t }, {0xF, 0x7, 0x7, 0xF}, {10, 7,4,0}, 0},
+    { "",     0x0000, 4,{vmul_op2_t, reg_t, vreg_t, vreg_t }, {0xF, 0x7, 0x7, 0x7}, {9,  6,3,0}, 0},
+    { 		 NULL, 0,			        0, {0,0,0,0,0,0},					{0,0,0,0,0,0},				{0,0,0,0,0,0},	0}
+};
+
+
+//vsh_short 14bit
+const apex_opc_info_t apex_short_vsh_op_opc_info[] = {
+    { "",    0x3F20, 2 ,{vsh_vc_op3_t, vcreg_t},        {0x1, 0x3},    {6 ,3},    0x7}, 
+    { "",    0x3F00, 2 ,{vsh_vc_op3_t, vcreg_t},        {0x1, 0x3},    {6 ,3},    0x7}, 
+    { "vmvc",0x3E80, 2 ,{vcreg_t, vreg_t},              { 0x3,0x7},     {3,0},  0x20}, //?????
+    { "vmcv",0x3EC0, 2 ,{vreg_t, vcreg_t},              { 0x7,0x3},     {3,0},  0x4}, //?????
+    { "",    0x3E00, 3 ,{vsh_vc_op1_t, reg_t, vreg_t},  {0x1, 0x3,0x3},{6 ,3,0},  0x0}, 
+    { "vnop",0x3C00, 0 ,{gap},                          {0},           {0},       0x1FF}, 
+    { "",    0x2000, 4 ,{vsh_op4_t, reg_t, vreg_t, reg_t}, {0x3, 0x7,0x7,0xF}, {10,7 ,4,0},  0x0}, 
+    { "",    0x1000, 4 ,{vsh_op3_t, reg_t, vreg_t, reg_t}, {0x3, 0x7,0x7,0xF}, {10,7 ,4,0},  0x0}, 
+    { "",    0x3000, 4 ,{vsh_op2_t, reg_t, vreg_t, imm_t}, {0x3, 0x7,0x7,0xF}, {10,7 ,4,0},  0x0}, 
+    { "",    0x0000, 4 ,{vsh_op1_t, reg_t, vreg_t, vreg_t},{0x3, 0x7,0x7,0x7}, {10,7 ,4,1},  0x1},
+    { 		 NULL, 0,			        0, {0,0,0,0,0,0},					{0,0,0,0,0,0},				{0,0,0,0,0,0},	0}
+};
+
+//vldst_short 14bit
+const apex_opc_info_t apex_short_vldst_op_opc_info[] = {
+    {"vnop", 0x0000, 0, {gap}, {0}, {0}, 0x7FF},
+    {"", 0x0000, 4,{vec_ldst_op2_t,vreg_t,reg_t,int5_t}, {0x3,0x7,0x7,0x1F},{11,8,5,0}, 0},
+    {"", 0x2000, 4,{vec_ldst_op1_t,vreg_t,reg_t,int5_t}, {0x3,0x7,0x7,0x1F},{11,8,5,0}, 0},
+    { 		 NULL, 0,			        0, {0,0,0,0,0,0},					{0,0,0,0,0,0},				{0,0,0,0,0,0},	0}
+};
+
+//vldst2_short 28bit
+const apex_opc_info_t apex_short_vldst2_op_opc_info[] = {
+    {"vnop", 0x0000000, 0, {gap}, {0}, {0}, 0xFFFC7FF},
+    {"",     0x0002000, 4, {vec_ldst_op1_t, vreg_t, reg_t, int12_t}, {0x3, 0x7,0x1F,0xFFF}, {11, 8,3,16}, 0xC007},
+    {"",     0x0000000, 4, {vec_ldst_op2_t, vreg_t, reg_t, int12_t}, {0x3, 0x7,0x1F,0xFFF}, {11, 8,3,16}, 0xC007},
+    {		 NULL, 0,	0, {0,0,0,0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0},	0}
+};
+
+//vswap_short 15bit
+const apex_opc_info_t apex_short_vswap_op_opc_info[] = {
+    {"vnop",     0x4800, 0, {gap}, {0}, {0}, 0x7FF},
+    {"vsel_vc",  0x4000, 4, {vreg_t, vreg_t, vreg_t, neg_op_t},     {0x7,0x7,0x3,0x1},     { 8,5,3,2}, 0x2},
+    {"vswap_vc", 0x4001, 4, {vreg_t, vreg_t, vreg_t, neg_op_t},     {0x7,0x7,0x3,0x1},     { 8,5,3,2}, 0x2},
+    {"",         0x0000, 3, {vswap_op_t, reg_t, reg_t},           {0x3, 0x7,0x1F,0xFFF},   {11,8,5}, 0x1E},
+    {		 NULL, 0,	0, {0,0,0,0,0,0}, {0,0,0,0,0,0}, {0,0,0,0,0,0},	0}
+};
+
+
+/*
+const apex_opc_info_t apex_short_vadd_op_opc_info[] ={
+    { "vadd", 0x000, 2,{reg_t, vreg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vaddx",0x040, 2,{reg_t, vreg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vaub", 0x080, 2,{reg_t, vreg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vaubx",0x0C0, 2,{reg_t, vreg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vand", 0x100, 2,{reg_t, vreg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vor",  0x140, 2,{reg_t, vreg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vxor", 0x180, 2,{reg_t, vreg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vxtd", 0x1C0, 2,{reg_t, vreg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vadd", 0x200, 2,{reg_t, reg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vaddx",0x240, 2,{reg_t, reg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vaub", 0x280, 2,{reg_t, reg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vaubx",0x2C0, 2,{reg_t, reg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vand", 0x300, 2,{reg_t, reg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vor",  0x340, 2,{reg_t, reg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vxor", 0x380, 2,{reg_t, reg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { "vxtd", 0x3C0, 2,{reg_t, reg_t, gap,gap,gap},{0x7, 0x7, 0,0,0}, {3, 0, 0,0,0}, 0},
+    { NULL, 0, 0,{0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, 0}
+};
+
+const apex_opc_info_t apex_short_vadd_op3_opc_info[] ={
+    { "vacc32s", 0x000, 3,{vreg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vacc32u", 0x200, 3,{vreg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vacc32s_s18", 0x400, 3,{vreg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vacc32u_s18", 0x600, 3,{vreg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { NULL, 0, 0,{0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, 0}
+};
+
+const apex_opc_info_t apex_short_vmul_op4_opc_info[] ={
+    { "vmul_lulu", 0x0000, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_hslu", 0x0400, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_hulu", 0x0800, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_hshu", 0x0C00, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_luhs", 0x1000, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_luhu", 0x1400, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_huhs", 0x1800, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_hshs", 0x1C00, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { NULL, 0, 0,{0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, 0}
+};
+
+const apex_opc_info_t apex_short_vmul_opc_info[] ={
+    { "vmul_lulu", 0x0200, 3,{reg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vmul_lslu", 0x0400, 3,{reg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vmul_lsls", 0x0600, 3,{reg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vmul_hulu", 0x0800, 3,{reg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vmul_huls", 0x0A00, 3,{reg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vmul_hslu", 0x0C00, 3,{reg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vmul_hsls", 0x0E00, 3,{reg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vmul_huhu", 0x1000, 3,{reg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vmul_hshu", 0x1200, 3,{reg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vmul_hshs", 0x1600, 3,{reg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    { "vmul",      0x1800, 3,{reg_t, vreg_t, vreg_t,gap,gap},{0x7, 0x7, 0x7,0,0}, {6, 3, 0,0,0}, 0},
+    
+    { "vmul_lulu", 0x4400, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_lslu", 0x4800, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_lsls", 0x4C00, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_hulu", 0x5000, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_huls", 0x5400, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_hslu", 0x5800, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_hsls", 0x5C00, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_huhu", 0x6000, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_hshu", 0x6400, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_hshs", 0x6800, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul",      0x6C00, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    
+    { "vmul_luls", 0x2000, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_luhu", 0x2400, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_lshu", 0x2800, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_luhs", 0x2C00, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_lshs", 0x3000, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_huhs", 0x3400, 3,{reg_t, vreg_t, reg_t,gap,gap},{0x7, 0x7, 0xF,0,0}, {7, 4, 0,0,0}, 0},
+    { "vmul_nop",  0x0000, 0,{gap,gap,gap,gap,gap},{0x0, 0x0, 0x0,0,0}, {0,0,0,0,0}, 0},
+    
+    { NULL, 0, 0,{0,0,0,0,0}, {0,0,0,0,0}, {0,0,0,0,0}, 0}
+};
+*/
+
+
+
+
+const char* vmul_op1[] = {
+    "vmul_lulu",
+    "vmul_hslu",
+    "vmul_hulu",
+    "vmul_hshu",
+    "vmul_huhu",
+    "vmul_hshs",
+    "vmul",
+    "unknonw"
+};
+
+const char* vmul_op2[] = {
+    "vmul_nop",
+    "vmul_lulu",
+    "vmul_lslu",
+    "vmul_lsls",
+    "vmul_hulu",
+    "vmul_huls",
+    "vmul_hslu",
+    "vmul_hsls",
+    "vmul_huhu",
+    "vmul_hshu",
+    "vmul_hshs",
+    "vmul"
+};
+
+const char* vmul_op3[] = {
+    "vmul_luls",
+    "vmul_luhu",
+    "vmul_lshu",
+    "vmul_luhs",
+    "vmul_lshs",
+    "vmul_huhs",
+    "unknown",
+    "unknown"
+};
+
+const char* vmul_op4[] = {
+    "vmul_lulu",
+    "vmul_hslu",
+    "vmul_hulu",
+    "vmul_hshu",
+    "vmul_luhs",
+    "vmul_luhu",
+    "vmul_huhs",
+    "vmul_hshs"
+};
+
+const char* vadd_op[] = {
+    "vadd",
+    "vaddx",
+    "vsub",
+    "vsubx",
+    "vand",
+    "vor",
+    "vxor",
+    "vxtd"
+};
+
+const char* vadd_op3[] = {
+    "vacc32s",
+    "vacc32u",
+    "vacc32s_s18",
+    "vacc32u_s18"
+};
+
+const char* vcomp_op[] = {
+    "vseq",
+    "vsge",
+    "vsgt",
+    "vsle",
+    "vslt",
+    "vsgeu",
+    "vsgtu",
+    "vsltu"
+};
+
+const char* vec_ldst_op1[] = {
+    "unknown",
+    "vsb",
+    "vsw",
+    "unknown"
+};
+
+const char* vec_ldst_op2[] = {
+    "unknown",
+    "vlb",
+    "vlbu",
+    "vlw"
+};
+
+const char* vnop[] = {
+    "nop"
+};
+
+const char* vmov_op1[] = {
+    "vmrlv",
+    "vmrrv"
+};
+
+const char* vmov_op2[] = {
+    "vmrlr",
+    "vmrrr"
+};
+
+const char* vmov_op3[] = {
+    "vmrhi",
+    "vmrh",
+    "vmrb",
+    "vmrbu"
+};
+
+const char* vsh_op1[] = {
+    "vsll",
+    "vsra",
+    "vsrl",
+    "vrl"
+};
+
+const char* vsh_op2[] = {
+    "vslli",
+    "vsrai",
+    "vsrli",
+    "unknown"
+};
+
+const char* vsh_op3[] = {
+    "vsllrl",
+    "vsrarl",
+    "vsrlrl",
+    "vrlrl"
+};
+
+const char* vsh_op4[] = {
+    "vsllrh",
+    "vsrarh",
+    "vsrlrh",
+    "vrlrh"
+};
+
+const char* vsh_vc_op1[] = {
+    "vsrl_ov",
+    "vsll_ov"
+};
+
+const char* vsh_vc_op2[] = {
+    "vmvc",
+    "vmcv"
+};
+
+const char* vsh_vc_op3[] = {
+    "vcinv",
+    "vcmv"
+};
+
+const char* vswap_op[] = {
+    "vspge",
+    "vspgt",
+    "vsple",
+    "vsplt",
+    "vspgeu",
+    "vspgtu",
+    "vspleu",
+    "vspltu"
+};
+
+const char* neg_op[] = {
+    "pass",
+    "negate"
+};
